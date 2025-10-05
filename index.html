@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KaiABC Circadian Oscillator MVP Plan</title>
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The application is designed as an interactive single-page dashboard with a fixed sidebar navigation. This structure was chosen to transform the dense, linear research document into a non-linear, explorable experience. Users can immediately grasp the project's scope from the 'Overview' and then dive into specific areas like the 'Core Model Simulation', 'Roadmap', or 'System Architecture' in any order. Key interactions include a live, parameter-driven chart for the oscillator model, which makes the core scientific concept tangible and demonstrates the effect of environmental inputs. An interactive timeline for the roadmap and accordions for research questions further break down complex information into digestible chunks. This task-oriented design prioritizes user understanding and engagement over simply re-presenting the report's text. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: KaiABC System Overview -> Goal: Organize/Inform -> Method: HTML/Tailwind Diagram -> Interaction: Static visual summary for quick comprehension. Justification: A visual map is more intuitive than text for system relationships.
+        - Report Info: KaiABC Mathematical Model -> Goal: Change/Relationships -> Method: Live Chart.js Line Chart -> Interaction: Sliders for temperature and ATP ratio dynamically update the oscillation simulation. Justification: This is the core 'wow' factor, making the abstract model concrete and interactive.
+        - Report Info: MVP Development Roadmap -> Goal: Organize/Inform -> Method: Interactive HTML/Tailwind Stepper/Timeline -> Interaction: Clicking a phase reveals its details. Justification: Breaks the development plan into clear, sequential steps.
+        - Report Info: Key Research Questions -> Goal: Organize -> Method: HTML/Tailwind Accordion -> Interaction: Clicking a category expands to show questions. Justification: Manages a large amount of text by categorizing it and hiding details until requested.
+        - Library/Method: All visualizations are built using Chart.js for the canvas-based chart and custom HTML/Tailwind for diagrams and UI elements, adhering to the NO SVG/Mermaid requirement. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f7f4;
+            color: #4a4a4a;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 50vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-link.active {
+            background-color: #eaddc7;
+            color: #6d5d47;
+            font-weight: 600;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .accordion-button.open .accordion-icon {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="flex flex-col md:flex-row">
+
+    <nav class="w-full md:w-64 bg-[#f0e9dd] border-b md:border-b-0 md:border-r border-[#dcd1ba] p-4 md:fixed md:h-screen">
+        <h1 class="text-xl font-bold text-[#6d5d47] mb-6">KaiABC Project</h1>
+        <ul class="space-y-2">
+            <li><a href="#overview" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7]">Overview</a></li>
+            <li><a href="#simulation" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7]">Core Model Simulation</a></li>
+            <li><a href="#roadmap" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7]">MVP Roadmap</a></li>
+            <li><a href="#architecture" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7]">System Architecture</a></li>
+            <li><a href="#questions" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7]">Key Questions</a></li>
+            <li><a href="#success" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7]">Success Criteria</a></li>
+        </ul>
+    </nav>
+
+    <main class="flex-1 md:ml-64 p-6 md:p-10">
+        
+        <section id="overview" class="mb-12">
+            <h2 class="text-3xl font-bold text-[#6d5d47] mb-4">Project Overview</h2>
+            <p class="mb-6 text-lg text-gray-700">This project defines a Minimum Viable Product (MVP) for a software implementation of the cyanobacterial KaiABC circadian clock. The core goal is to create a robust oscillator model that uses real-time environmental sensor data to modulate its behavior and drive practical applications.</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold text-[#8a7962] mb-4">System Concept Flow</h3>
+                     <p class="text-gray-600 mb-6">The system integrates environmental inputs with a biological clock model to produce a rhythmic, actionable output. This simulates how organisms synchronize their internal clocks with external day/night and temperature cycles.</p>
+                    <div class="flex flex-col md:flex-row items-center justify-around space-y-4 md:space-y-0 md:space-x-4">
+                        <div class="text-center p-4 rounded-lg bg-blue-50 border border-blue-200 w-full md:w-auto">
+                            <div class="text-4xl mb-2">🌡️</div>
+                            <h4 class="font-bold text-blue-800">1. Input</h4>
+                            <p class="text-sm text-blue-600">BME280/DHT22 Sensor Data (Temp, Humidity)</p>
+                        </div>
+                        <div class="text-2xl font-mono text-gray-400">→</div>
+                        <div class="text-center p-4 rounded-lg bg-green-50 border border-green-200 w-full md:w-auto">
+                             <div class="text-4xl mb-2">🧬</div>
+                            <h4 class="font-bold text-green-800">2. Process</h4>
+                            <p class="text-sm text-green-600">KaiABC Oscillator Model (Software Simulation)</p>
+                        </div>
+                        <div class="text-2xl font-mono text-gray-400">→</div>
+                        <div class="text-center p-4 rounded-lg bg-purple-50 border border-purple-200 w-full md:w-auto">
+                             <div class="text-4xl mb-2">💡</div>
+                            <h4 class="font-bold text-purple-800">3. Output</h4>
+                            <p class="text-sm text-purple-600">Actionable Signal (LED, Relay, Data)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold text-[#8a7962] mb-4">MVP Scope</h3>
+                     <ul class="space-y-3 text-gray-700">
+                        <li class="flex items-start"><span class="text-green-500 font-bold mr-2">✓</span> <strong>Must Have:</strong> Core Oscillator, Sensor Integration, Basic Output.</li>
+                        <li class="flex items-start"><span class="text-yellow-500 font-bold mr-2">~</span> <strong>Should Have:</strong> SasA/RpaA Output Coupling, LdpA Input Sensing.</li>
+                        <li class="flex items-start"><span class="text-blue-500 font-bold mr-2">?</span> <strong>Could Have:</strong> Machine Learning, Population Sync, Smart Home Integration.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="simulation" class="mb-12">
+            <h2 class="text-3xl font-bold text-[#6d5d47] mb-4">Core Model Simulation</h2>
+            <p class="mb-6 text-lg text-gray-700">This interactive simulation visualizes the core KaiABC oscillator. The chart displays the concentration of different phosphorylated forms of the KaiC protein, which drives the ~24-hour rhythm. Adjust the environmental parameters below to see how they entrain or alter the clock's behavior in real-time.</p>
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div class="chart-container">
+                    <canvas id="kaiChart"></canvas>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6 pt-4 border-t border-gray-200">
+                    <div>
+                        <label for="temperature" class="block text-sm font-medium text-gray-700">Temperature (°C)</label>
+                        <input type="range" id="temperature" min="15" max="45" value="30" step="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="text-center font-semibold text-[#6d5d47]" id="temperatureValue">30 °C</div>
+                        <p class="text-xs text-gray-500 mt-1">Temperature affects the rate of KaiC's ATPase activity, changing the clock's period.</p>
+                    </div>
+                    <div>
+                        <label for="atpRatio" class="block text-sm font-medium text-gray-700">ATP/ADP Ratio</label>
+                        <input type="range" id="atpRatio" min="0.1" max="2.0" value="1.0" step="0.1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                        <div class="text-center font-semibold text-[#6d5d47]" id="atpRatioValue">1.0</div>
+                        <p class="text-xs text-gray-500 mt-1">The energy state of the cell (ATP availability) drives the phosphorylation cycle.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="roadmap" class="mb-12">
+            <h2 class="text-3xl font-bold text-[#6d5d47] mb-4">MVP Development Roadmap</h2>
+            <p class="mb-6 text-lg text-gray-700">The project is structured into four distinct phases, moving from core simulation to a fully validated prototype over approximately six weeks. Each phase has clear objectives and success criteria to ensure focused development.</p>
+
+            <div class="relative">
+                <div class="absolute left-4 md:left-1/2 -ml-px w-0.5 h-full bg-[#dcd1ba]"></div>
+                <div class="space-y-12">
+                    <div class="roadmap-item relative flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 md:pr-8 text-right">
+                            <div class="p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                                <p class="text-sm font-semibold text-blue-600">Weeks 1-2</p>
+                                <h3 class="text-xl font-bold text-[#8a7962]">Phase 1: Core Simulation</h3>
+                                <p class="mt-2 text-gray-600">Implement the basic KaiABC ODE model in Python. Verify stable ~24-hour oscillation and create initial visualizations.</p>
+                                <p class="mt-2 text-sm text-green-700 font-semibold">✓ Success: Stable oscillation for 10+ cycles.</p>
+                            </div>
+                        </div>
+                        <div class="absolute left-4 md:left-1/2 -ml-2.5 w-5 h-5 bg-blue-500 rounded-full border-4 border-white"></div>
+                        <div class="md:w-1/2 md:pl-8"></div>
+                    </div>
+
+                    <div class="roadmap-item relative flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 md:pr-8"></div>
+                         <div class="absolute left-4 md:left-1/2 -ml-2.5 w-5 h-5 bg-blue-500 rounded-full border-4 border-white"></div>
+                        <div class="md:w-1/2 md:pl-8 text-left">
+                           <div class="p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                                <p class="text-sm font-semibold text-blue-600">Weeks 3-4</p>
+                                <h3 class="text-xl font-bold text-[#8a7962]">Phase 2: Sensor Integration</h3>
+                                <p class="mt-2 text-gray-600">Connect BME280/DHT22 sensor to an ESP32/Raspberry Pi. Map temperature readings to model parameters to test entrainment.</p>
+                                <p class="mt-2 text-sm text-green-700 font-semibold">✓ Success: Phase shifts in response to temperature.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="roadmap-item relative flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 md:pr-8 text-right">
+                            <div class="p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                                <p class="text-sm font-semibold text-blue-600">Week 5</p>
+                                <h3 class="text-xl font-bold text-[#8a7962]">Phase 3: Output Coupling</h3>
+                                <p class="mt-2 text-gray-600">Implement a simplified output model (e.g., SasA/RpaA) to drive a physical component like an LED based on the clock's state.</p>
+                                 <p class="mt-2 text-sm text-green-700 font-semibold">✓ Success: Visible circadian output rhythm.</p>
+                           </div>
+                        </div>
+                         <div class="absolute left-4 md:left-1/2 -ml-2.5 w-5 h-5 bg-blue-500 rounded-full border-4 border-white"></div>
+                        <div class="md:w-1/2 md:pl-8"></div>
+                    </div>
+
+                     <div class="roadmap-item relative flex flex-col md:flex-row items-center">
+                        <div class="md:w-1/2 md:pr-8"></div>
+                         <div class="absolute left-4 md:left-1/2 -ml-2.5 w-5 h-5 bg-blue-500 rounded-full border-4 border-white"></div>
+                        <div class="md:w-1/2 md:pl-8 text-left">
+                            <div class="p-6 bg-white rounded-lg shadow-sm border border-gray-200">
+                                <p class="text-sm font-semibold text-blue-600">Week 6</p>
+                                <h3 class="text-xl font-bold text-[#8a7962]">Phase 4: Validation & Docs</h3>
+                                <p class="mt-2 text-gray-600">Compare model behavior to published biological data. Test system robustness and document the code for open-source release.</p>
+                                <p class="mt-2 text-sm text-green-700 font-semibold">✓ Success: Reproducible results and user guide.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture" class="mb-12">
+            <h2 class="text-3xl font-bold text-[#6d5d47] mb-4">System Architecture</h2>
+            <p class="mb-6 text-lg text-gray-700">The proposed architecture prioritizes a balance of performance, cost, and development speed. An embedded microcontroller serves as the brain, running the simulation on-device (at the edge) for a self-contained system.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold text-[#8a7962] mb-4">Hardware Stack</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li><strong>Platform:</strong> ESP32 or Raspberry Pi Zero ($5-15)</li>
+                        <li><strong>Sensor:</strong> BME280 Temperature/Humidity/Pressure ($8-15)</li>
+                        <li><strong>Output:</strong> Basic LED, resistors, breadboard</li>
+                        <li><strong>Power:</strong> USB or battery</li>
+                        <li class="font-semibold">Total Hardware Budget: &lt;$50</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold text-[#8a7962] mb-4">Software & Data</h3>
+                    <ul class="list-disc list-inside space-y-2 text-gray-700">
+                        <li><strong>Language:</strong> Python 3 with NumPy/SciPy or MicroPython/C++ for embedded</li>
+                        <li><strong>Simulation Core:</strong> On-device (edge computation)</li>
+                        <li><strong>Data Handling:</strong> Real-time processing with minimal persistence (RAM buffer or SD card logging)</li>
+                        <li><strong>Visualization:</strong> Matplotlib/Plotly for development, direct hardware for MVP output</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section id="questions" class="mb-12">
+            <h2 class="text-3xl font-bold text-[#6d5d47] mb-4">Key Research Questions</h2>
+            <p class="mb-6 text-lg text-gray-700">The MVP development is guided by critical questions across several technical domains. Answering these will ensure the final product is both scientifically sound and technically robust.</p>
+            <div class="space-y-4">
+                <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                    <button class="accordion-button w-full p-4 text-left font-semibold text-lg text-[#8a7962] flex justify-between items-center">
+                        <span>1. KaiABC Mathematical Modeling</span>
+                        <span class="accordion-icon transition-transform duration-300">▼</span>
+                    </button>
+                    <div class="accordion-content px-4 pb-4">
+                        <ul class="list-disc list-inside space-y-2 text-gray-600 pt-2 border-t border-gray-200">
+                            <li>What are the validated differential equation models for KaiABC oscillation?</li>
+                            <li>How do ATP/ADP ratios drive the phosphorylation cycle in computational models?</li>
+                            <li>What parameter ranges produce stable 24-hour oscillations?</li>
+                            <li>Can the model be simplified for embedded systems while maintaining core behavior?</li>
+                            <li>What numerical solvers (Euler, Runge-Kutta) are optimal for microcontrollers?</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                    <button class="accordion-button w-full p-4 text-left font-semibold text-lg text-[#8a7962] flex justify-between items-center">
+                        <span>2. Environmental Coupling</span>
+                        <span class="accordion-icon transition-transform duration-300">▼</span>
+                    </button>
+                    <div class="accordion-content px-4 pb-4">
+                        <ul class="list-disc list-inside space-y-2 text-gray-600 pt-2 border-t border-gray-200">
+                           <li>How does temperature affect KaiC ATPase activity and phosphorylation kinetics?</li>
+                           <li>What mathematical functions (e.g., Q10, Arrhenius) best represent environmental influence?</li>
+                           <li>How should sensor data be mapped to model parameters?</li>
+                           <li>How do we prevent sensor noise from destabilizing the oscillator?</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="accordion-item bg-white rounded-lg shadow-sm border border-gray-200">
+                    <button class="accordion-button w-full p-4 text-left font-semibold text-lg text-[#8a7962] flex justify-between items-center">
+                        <span>3. Software & System Integration</span>
+                        <span class="accordion-icon transition-transform duration-300">▼</span>
+                    </button>
+                    <div class="accordion-content px-4 pb-4">
+                       <ul class="list-disc list-inside space-y-2 text-gray-600 pt-2 border-t border-gray-200">
+                           <li>What is the minimal hardware platform (Arduino, ESP32, RPi Zero)?</li>
+                           <li>Should simulation run on-device (edge) or cloud-based?</li>
+                           <li>How should the system handle real-time constraints?</li>
+                           <li>What is the simplest useful output (binary on/off vs. PWM)?</li>
+                           <li>What fail-safes are needed for sensor failure or oscillator disruption?</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="success" class="mb-12">
+            <h2 class="text-3xl font-bold text-[#6d5d47] mb-4">MVP Success Criteria</h2>
+            <p class="mb-6 text-lg text-gray-700">The success of the MVP will be measured against these five core criteria. Achieving them will validate the project's foundational concept and provide a strong basis for future development.</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-green-200">
+                    <h3 class="font-bold text-green-800 text-lg">✅ Autonomous Oscillation</h3>
+                    <p class="text-gray-600 mt-2">Model produces a stable ~24h rhythm without any external forcing signals.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-green-200">
+                    <h3 class="font-bold text-green-800 text-lg">✅ Environmental Response</h3>
+                    <p class="text-gray-600 mt-2">Temperature changes from the sensor measurably affect the period or phase of the clock.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-green-200">
+                    <h3 class="font-bold text-green-800 text-lg">✅ Entrainment</h3>
+                    <p class="text-gray-600 mt-2">The software clock successfully synchronizes its phase to imposed temperature cycles.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-green-200">
+                    <h3 class="font-bold text-green-800 text-lg">✅ Practical Output</h3>
+                    <p class="text-gray-600 mt-2">A physical output (e.g., an LED's brightness) visibly reflects the circadian state.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-green-200">
+                    <h3 class="font-bold text-green-800 text-lg">✅ Robustness</h3>
+                    <p class="text-gray-600 mt-2">The complete system runs continuously for 7+ days without crashing or requiring a manual reset.</p>
+                </div>
+                 <div class="bg-white p-6 rounded-lg shadow-sm border border-green-200">
+                    <h3 class="font-bold text-green-800 text-lg">✅ Reproducibility</h3>
+                    <p class="text-gray-600 mt-2">The code and hardware setup can be reliably replicated by another developer following the documentation.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('kaiChart').getContext('2d');
+            let kaiChart;
+            
+            const tempSlider = document.getElementById('temperature');
+            const tempValue = document.getElementById('temperatureValue');
+            const atpSlider = document.getElementById('atpRatio');
+            const atpValue = document.getElementById('atpRatioValue');
+
+            let simulationParams = {
+                temp: 30,
+                atp: 1.0,
+                y0: [0.1, 0.2, 0.3, 0.4], 
+                t_span: [0, 120], 
+                dt: 0.1,
+            };
+
+            function runKaiSimulation(params) {
+                let { y0, t_span, dt, temp, atp } = params;
+                let t = [];
+                let y = [[], [], [], []];
+                let current_y = [...y0];
+
+                const base_k_st = 0.2; 
+                const base_k_ut = 0.3;
+                const base_k_us = 0.1; 
+                const base_k_su = 0.15;
+                
+                const q10 = 2.0;
+                const temp_factor = Math.pow(q10, (temp - 30) / 10);
+
+                const k_st = base_k_st * temp_factor * atp;
+                const k_ut = base_k_ut * temp_factor;
+                const k_us = base_k_us * temp_factor * atp;
+                const k_su = base_k_su * temp_factor;
+
+                for (let time = t_span[0]; time <= t_span[1]; time += dt) {
+                    t.push(time);
+                    y[0].push(current_y[0]);
+                    y[1].push(current_y[1]);
+                    y[2].push(current_y[2]);
+                    y[3].push(current_y[3]);
+
+                    let [S, T, U, F] = current_y; 
+                    
+                    let dS_dt = k_us * U - k_st * S;
+                    let dT_dt = k_st * S - k_ut * T;
+                    let dU_dt = k_ut * T - k_us * U + k_su * F;
+                    let dF_dt = k_su * F > 0 ? -k_su * F : 0; 
+                    
+                    let next_y = [
+                        S + dS_dt * dt,
+                        T + dT_dt * dt,
+                        U + dU_dt * dt,
+                        1 - (S + dS_dt * dt) - (T + dT_dt * dt) - (U + dU_dt * dt)
+                    ];
+                    
+                    current_y = next_y.map(val => Math.max(0, val));
+                    const total = current_y.reduce((a, b) => a + b, 0);
+                    if (total > 0) {
+                        current_y = current_y.map(v => v / total);
+                    }
+                }
+                return { t, y };
+            }
+
+            function createOrUpdateChart() {
+                const data = runKaiSimulation(simulationParams);
+                const chartData = {
+                    labels: data.t,
+                    datasets: [
+                        { label: 'KaiC-S (Singly Phos.)', data: data.y[0], borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 2, fill: false, pointRadius: 0 },
+                        { label: 'KaiC-T (Singly Phos.)', data: data.y[1], borderColor: 'rgba(255, 99, 132, 1)', borderWidth: 2, fill: false, pointRadius: 0 },
+                        { label: 'KaiC-U (Unphos.)', data: data.y[2], borderColor: 'rgba(75, 192, 192, 1)', borderWidth: 2, fill: false, pointRadius: 0 },
+                        { label: 'KaiC-F (Fully Phos.)', data: data.y[3], borderColor: 'rgba(255, 206, 86, 1)', borderWidth: 2, fill: false, pointRadius: 0 }
+                    ]
+                };
+
+                if (kaiChart) {
+                    kaiChart.data = chartData;
+                    kaiChart.update();
+                } else {
+                    kaiChart = new Chart(ctx, {
+                        type: 'line',
+                        data: chartData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                x: { title: { display: true, text: 'Time (hours)' } },
+                                y: { title: { display: true, text: 'KaiC Concentration (Normalized)' }, min: 0, max: 1 }
+                            },
+                            plugins: {
+                                legend: { position: 'top' },
+                                title: { display: true, text: 'KaiC Phosphorylation Cycle' }
+                            },
+                            animation: { duration: 0 }
+                        }
+                    });
+                }
+            }
+
+            tempSlider.addEventListener('input', (e) => {
+                const temp = parseFloat(e.target.value);
+                simulationParams.temp = temp;
+                tempValue.textContent = `${temp} °C`;
+                createOrUpdateChart();
+            });
+
+            atpSlider.addEventListener('input', (e) => {
+                const atp = parseFloat(e.target.value);
+                simulationParams.atp = atp;
+                atpValue.textContent = atp.toFixed(1);
+                createOrUpdateChart();
+            });
+
+            createOrUpdateChart();
+
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 60) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+            
+            navLinks[0].classList.add('active');
+            
+            document.querySelectorAll('.accordion-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    const content = button.nextElementSibling;
+                    button.classList.toggle('open');
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>
