@@ -66,7 +66,37 @@ This API specification defines the interface for the KaiABC Circadian Oscillator
 
 - **HTTP/REST:** Configuration, queries, and non-time-critical operations
 - **WebSocket:** Real-time state streaming and low-latency control
-- **MQTT:** Lightweight sensor data ingestion from ESP32 nodes (optional)
+- **MQTT:** Lightweight sensor data ingestion from Pico/ELM11 nodes (optional)
+
+### Rationale for Client-Server Architecture with Pico/ELM11
+
+The client-server architecture is particularly well-suited for Raspberry Pi Pico and ELM11 boards:
+
+**1. Computational Offloading**
+- **No Hardware FPU:** Pico's RP2040 lacks hardware floating-point unit
+- **Lua Overhead:** ELM11's Lua interpreter adds computational cost
+- **Server Advantage:** Centralized server performs intensive ODE integration using optimized C/C++ code
+- **Node Advantage:** Nodes focus on efficient sensor reading and local PWM control
+
+**2. Memory Constraints**
+- **Pico (264KB SRAM):** Sufficient for sensor buffering, not full ODE state history
+- **ELM11 (128-512KB):** Variable capacity depending on model
+- **Server Advantage:** Unlimited storage for historical data, Kalman filter matrices, PRC lookup tables
+
+**3. Multi-Node Coordination**
+- Server can coordinate multiple sensor nodes across different environments
+- Centralized entrainment control for synchronized experiments
+- Aggregate data analysis across all nodes
+
+**4. Development Flexibility**
+- **Pico:** MicroPython enables rapid sensor integration
+- **ELM11:** Lua scripting simplifies field deployment and configuration
+- **Server:** Python/FastAPI or similar enables sophisticated scientific computing libraries
+
+**5. Fault Tolerance**
+- Nodes maintain basic PWM output during network outages
+- Server maintains simulation continuity across node disconnections
+- Automatic recovery and state synchronization on reconnection
 
 ---
 
@@ -183,7 +213,8 @@ Retrieve historical oscillator state data.
 **Response:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
+  "hardware_type": "raspberry_pi_pico",
   "start_time": "2025-10-05T00:00:00Z",
   "end_time": "2025-10-06T00:00:00Z",
   "resolution": "1m",
@@ -208,7 +239,7 @@ Submit temperature sensor reading from ESP32 node.
 **Request Body:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "timestamp": "2025-10-06T12:00:00.123Z",
   "temperature_kelvin": 298.65,
   "raw_value": 25.5,
@@ -234,7 +265,7 @@ Submit batch sensor readings (temperature, humidity, pressure).
 **Request Body:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "readings": [
     {
       "timestamp": "2025-10-06T12:00:00.000Z",
@@ -1028,6 +1059,8 @@ interface PhaseShiftRequest {
 - **researcher**: Read/write access to simulation and entrainment
 - **observer**: Read-only access
 - **node**: Sensor node access (data submission only)
+  - `node:pico`: Raspberry Pi Pico devices
+  - `node:elm11`: ELM11 Lua devices
 
 ### Rate Limiting
 
@@ -1111,19 +1144,23 @@ X-RateLimit-Reset: 1696598400
 
 ## Implementation Notes
 
-### ESP32 Client Integration
+### Raspberry Pi Pico Client Integration
 
-Example ESP32 MicroPython client code:
+Example Raspberry Pi Pico MicroPython client code:
 
 ```python
 import urequests
 import ujson
-from machine import Pin, I2C
+from machine import Pin, I2C, PWM
 import time
 
 API_BASE = "http://192.168.1.100:8000/v1"
-API_KEY = "kaiabc_node_esp32_001"
-NODE_ID = "esp32_001"
+API_KEY = "kaiabc_node_pico_001"
+NODE_ID = "pico_001"
+
+# PWM setup for output control
+pwm_pin = PWM(Pin(15))
+pwm_pin.freq(1000)
 
 def send_sensor_data(temp_k, humidity, pressure):
     headers = {
@@ -1152,12 +1189,196 @@ def get_current_state():
         f"{API_BASE}/oscillator/state?node_id={NODE_ID}",
         headers=headers
     )
-    return response.json()
+    state = response.json()
+    # Update local PWM based on KOA
+    if 'output_pwm' in state:
+        pwm_pin.duty_u16(state['output_pwm'] * 257)  # Convert 0-255 to 0-65535
+    return state
+
+def register_node():
+    """Register this Pico with the server on startup"""
+    headers = {
+        "X-API-Key": API_KEY,
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "node_id": NODE_ID,
+        "name": "Pico Lab Node 1",
+        "hardware_type": "raspberry_pi_pico",
+        "runtime": "micropython",
+        "sensor_types": ["temperature", "humidity", "pressure"],
+        "location": "Lab Bench 3"
+    }
+    try:
+        response = urequests.post(
+            f"{API_BASE}/sensors/nodes",
+            headers=headers,
+            data=ujson.dumps(payload)
+        )
+        return response.json()
+    except Exception as e:
+        print(f"Registration failed: {e}")
+        return None
 ```
+
+### ELM11 Lua Client Integration
+
+Example ELM11 Lua client code:
+
+```lua
+-- ELM11 Lua Client for KaiABC
+local http = require("socket.http")
+local json = require("cjson")
+local ltn12 = require("ltn12")
+
+API_BASE = "http://192.168.1.100:8000/v1"
+API_KEY = "kaiabc_node_elm11_001"
+NODE_ID = "elm11_001"
+
+-- PWM setup (ELM11 specific)
+pwm = require("pwm")
+pwm.setup(1, 1000, 0)  -- pin 1, 1kHz frequency, 0% duty
+pwm.start(1)
+
+function send_sensor_data(temp_k, humidity, pressure)
+    local payload = json.encode({
+        node_id = NODE_ID,
+        readings = {{
+            timestamp = os.date("!%Y-%m-%dT%H:%M:%SZ"),
+            temperature_kelvin = temp_k,
+            humidity_percent = humidity,
+            pressure_pa = pressure,
+            sensor_type = "BME280",
+            quality = "good"
+        }}
+    })
+    
+    local response_body = {}
+    local res, code, headers = http.request({
+        url = API_BASE .. "/sensors/batch",
+        method = "POST",
+        headers = {
+            ["X-API-Key"] = API_KEY,
+            ["Content-Type"] = "application/json",
+            ["Content-Length"] = #payload
+        },
+        source = ltn12.source.string(payload),
+        sink = ltn12.sink.table(response_body)
+    })
+    
+    if code == 200 then
+        return json.decode(table.concat(response_body))
+    else
+        print("Error: HTTP " .. code)
+        return nil
+    end
+end
+
+function get_current_state()
+    local response_body = {}
+    local res, code = http.request({
+        url = API_BASE .. "/oscillator/state?node_id=" .. NODE_ID,
+        method = "GET",
+        headers = {
+            ["X-API-Key"] = API_KEY
+        },
+        sink = ltn12.sink.table(response_body)
+    })
+    
+    if code == 200 then
+        local state = json.decode(table.concat(response_body))
+        -- Update PWM based on KOA
+        if state.output_pwm then
+            local duty = math.floor((state.output_pwm / 255) * 1023)
+            pwm.setduty(1, duty)
+        end
+        return state
+    else
+        return nil
+    end
+end
+
+function register_node()
+    local payload = json.encode({
+        node_id = NODE_ID,
+        name = "ELM11 Field Node 1",
+        hardware_type = "elm11",
+        runtime = "lua",
+        sensor_types = {"temperature", "humidity"},
+        location = "Outdoor Station"
+    })
+    
+    local response_body = {}
+    local res, code = http.request({
+        url = API_BASE .. "/sensors/nodes",
+        method = "POST",
+        headers = {
+            ["X-API-Key"] = API_KEY,
+            ["Content-Type"] = "application/json",
+            ["Content-Length"] = #payload
+        },
+        source = ltn12.source.string(payload),
+        sink = ltn12.sink.table(response_body)
+    })
+    
+    return code == 200 or code == 201
+end
+
+-- Main loop
+function main_loop()
+    -- Register on startup
+    register_node()
+    
+    while true do
+        -- Read sensors (pseudo-code, adjust for ELM11 I2C)
+        local temp, humidity, pressure = read_bme280()
+        
+        -- Send to server
+        send_sensor_data(temp + 273.15, humidity, pressure)
+        
+        -- Get updated state and output
+        get_current_state()
+        
+        -- Sleep for 5 seconds
+        tmr.delay(5000000)  -- microseconds
+    end
+end
+```
+
+### Hardware Considerations
+
+#### Raspberry Pi Pico
+- **Processor:** RP2040 dual-core ARM Cortex-M0+ @ 133MHz
+- **Memory:** 264KB SRAM, 2MB Flash
+- **Floating-Point:** Software floating-point (no FPU)
+- **Networking:** Requires external WiFi module (e.g., ESP8266 via UART, or Pico W variant)
+- **PWM Channels:** 16 PWM channels
+- **I2C Support:** 2 I2C controllers
+- **MicroPython:** Full support, excellent performance
+
+**Performance Notes:**
+- Sufficient for sensor reading and data transmission
+- Server-side ODE computation recommended due to no hardware FPU
+- Local PWM output control is efficient
+- 264KB RAM adequate for buffering ~1 hour of sensor data
+
+#### ELM11
+- **Processor:** Typically ARM Cortex-M3/M4 (varies by model)
+- **Memory:** 128-512KB SRAM (model dependent)
+- **Lua Runtime:** eLua or NodeMCU-style Lua interpreter
+- **Networking:** Built-in WiFi (model dependent)
+- **PWM Support:** Multiple channels
+- **I2C Support:** Yes
+
+**Performance Notes:**
+- Lua interpreter adds overhead but simplifies development
+- Server-side computation strongly recommended
+- Good for rapid prototyping and scripting
+- Check specific ELM11 model documentation for exact capabilities
 
 ### Server-Side Fallback
 
-If network connectivity is lost, ESP32 nodes should:
+If network connectivity is lost, Raspberry Pi Pico and ELM11 nodes should:
 1. Continue local PWM output based on last known state
 2. Buffer sensor readings (up to 1 hour)
 3. Resume data transmission when connectivity restored
