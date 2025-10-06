@@ -25,11 +25,12 @@
 
 This API specification defines the interface for the KaiABC Circadian Oscillator system, transitioning from a standalone embedded architecture to a distributed client-server model. The API enables:
 
-- Real-time monitoring of circadian oscillator state
-- Remote sensor data ingestion from multiple ESP32 nodes
+- Real-time monitoring of circadian oscillator state across multiple nodes
+- Remote sensor data ingestion from Raspberry Pi Pico and ELM11 nodes
 - Centralized ODE computation and entrainment control
 - Multi-client visualization and parameter management
-- Historical data logging and analysis
+- Historical data logging and analysis with time-series optimization
+- Fault-tolerant operation with automatic failover
 
 ### Design Principles
 
@@ -234,7 +235,7 @@ Retrieve historical oscillator state data.
 
 ### `POST /sensors/temperature`
 
-Submit temperature sensor reading from ESP32 node.
+Submit temperature sensor reading from Pico/ELM11 node.
 
 **Request Body:**
 ```json
@@ -375,7 +376,7 @@ Retrieve current entrainment transfer function parameters.
 **Response:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "etf_active": true,
   "reference_temperature_kelvin": 298.15,
   "parameters": {
@@ -406,7 +407,7 @@ Update entrainment transfer function parameters.
 **Request Body:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "parameters": {
     "structural_coupling": {
       "sensitivity": 1.5
@@ -434,7 +435,7 @@ Trigger a manual phase shift using PRC logic.
 **Request Body:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "shift_type": "advance" | "delay",
   "magnitude_hours": 2.0,
   "method": "temperature_step",
@@ -536,7 +537,7 @@ Pause the oscillator simulation.
 **Request Body:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "reason": "maintenance"
 }
 ```
@@ -557,7 +558,7 @@ Resume a paused simulation.
 **Request Body:**
 ```json
 {
-  "node_id": "esp32_001"
+  "node_id": "pico_001"
 }
 ```
 
@@ -584,7 +585,7 @@ Retrieve current KOA (Kai-complex Output Activity) metric.
 **Response:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "koa_value": 0.67,
   "koa_normalized": 0.67,
   "koa_phase": "ascending",
@@ -607,7 +608,7 @@ Configure the KOA to PWM output mapping.
 **Request Body:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "mapping_function": "linear" | "sigmoid" | "custom",
   "pwm_min": 0,
   "pwm_max": 255,
@@ -637,7 +638,7 @@ Manually override the output signal.
 **Request Body:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "override_enabled": true,
   "pwm_value": 200,
   "duration_minutes": 60,
@@ -668,7 +669,7 @@ Retrieve current Kalman filter state.
 **Response:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "filter_type": "extended_kalman",
   "state_estimate": {
     "temperature_kelvin": 298.60,
@@ -696,7 +697,7 @@ Update Kalman filter parameters.
 **Request Body:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "process_noise": {
     "temperature": 0.01,
     "humidity": 0.02,
@@ -726,7 +727,7 @@ Reset the Kalman filter to initial state.
 **Request Body:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "reason": "Sensor recalibration"
 }
 ```
@@ -755,7 +756,7 @@ Analyze period stability over time.
 **Response:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "analysis_period": {
     "start": "2025-09-29T00:00:00Z",
     "end": "2025-10-06T00:00:00Z"
@@ -787,7 +788,7 @@ Evaluate entrainment response efficiency.
 **Response:**
 ```json
 {
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "recent_shifts": [
     {
       "shift_id": "shift_20251005_001",
@@ -855,9 +856,9 @@ Clients subscribe to specific event streams:
 {
   "action": "subscribe",
   "streams": [
-    "oscillator.state.esp32_001",
-    "sensors.temperature.esp32_001",
-    "output.koa.esp32_001"
+    "oscillator.state.pico_001",
+    "sensors.temperature.pico_001",
+    "output.koa.pico_001"
   ]
 }
 ```
@@ -869,7 +870,7 @@ Real-time oscillator state updates (typically every 1-10 seconds).
 ```json
 {
   "event": "oscillator.state",
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "timestamp": "2025-10-06T12:00:00.123Z",
   "data": {
     "circadian_time": 14.52,
@@ -890,7 +891,7 @@ Real-time sensor data after Kalman filtering.
 ```json
 {
   "event": "sensors.reading",
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "timestamp": "2025-10-06T12:00:00.123Z",
   "data": {
     "temperature_kelvin": 298.60,
@@ -908,7 +909,7 @@ PWM output changes.
 ```json
 {
   "event": "output.pwm",
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "timestamp": "2025-10-06T12:00:00.123Z",
   "data": {
     "duty_cycle": 170,
@@ -927,7 +928,7 @@ System alerts and warnings.
 {
   "event": "alert",
   "severity": "warning",
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "timestamp": "2025-10-06T12:00:00.123Z",
   "message": "Integration error exceeded tolerance threshold",
   "code": "ODE_STABILITY_WARNING",
@@ -947,7 +948,7 @@ Phase shift operation completed.
 {
   "event": "phase_shift.complete",
   "shift_id": "shift_20251006_001",
-  "node_id": "esp32_001",
+  "node_id": "pico_001",
   "timestamp": "2025-10-06T12:30:00Z",
   "data": {
     "target_shift_hours": 2.0,
@@ -1045,13 +1046,17 @@ interface PhaseShiftRequest {
 
 ### Authentication Methods
 
-1. **API Keys** (for ESP32 nodes)
+1. **API Keys** (for Raspberry Pi Pico and ELM11 nodes)
    - Header: `X-API-Key: kaiabc_node_abc123xyz789`
    - Scoped to specific node_id
 
 2. **JWT Tokens** (for web clients)
    - Header: `Authorization: Bearer eyJhbGc...`
    - Includes user permissions and roles
+
+3. **OAuth2** (for advanced web applications)
+   - Authorization Code Grant flow
+   - Client Credentials for service-to-service communication
 
 ### Authorization Roles
 
@@ -1142,7 +1147,548 @@ X-RateLimit-Reset: 1696598400
 
 ---
 
-## Implementation Notes
+## API Versioning
+
+### Version Strategy
+
+The API uses URL-based versioning to ensure backward compatibility:
+
+- **Current Version:** `v1` (2025-10-06)
+- **Version Format:** `/v{major}` (e.g., `/v1`, `/v2`)
+- **Deprecation Policy:** 12 months notice for breaking changes
+- **Sunset Policy:** 24 months support after deprecation
+
+### Version Headers
+
+```http
+Accept: application/vnd.kaiabc.v1+json
+X-API-Version: 1.0.0
+```
+
+### Breaking Changes Policy
+
+- PATCH versions: Bug fixes only
+- MINOR versions: Backward-compatible additions
+- MAJOR versions: Breaking changes
+
+---
+
+## Pagination
+
+List endpoints support cursor-based pagination for efficient data retrieval:
+
+**Query Parameters:**
+- `limit`: Maximum items per page (default: 50, max: 1000)
+- `cursor`: Cursor for next page
+- `sort`: Sort field and direction (e.g., `timestamp:desc`)
+
+**Response Format:**
+```json
+{
+  "data": [...],
+  "pagination": {
+    "has_next": true,
+    "has_prev": false,
+    "next_cursor": "eyJ0aW1lc3RhbXAiOiIyMDI1LTEwLTA2VDEyOjAwOjAwWiIsImlkIjoicGljb18wMDEifQ==",
+    "prev_cursor": null,
+    "total_count": 1250,
+    "limit": 50
+  }
+}
+```
+
+---
+
+## 9. Bulk Operations
+
+### `POST /bulk/sensor-readings`
+
+Submit multiple sensor readings in a single request for efficiency.
+
+**Request Body:**
+```json
+{
+  "readings": [
+    {
+      "node_id": "pico_001",
+      "timestamp": "2025-10-06T12:00:00Z",
+      "temperature_kelvin": 298.65,
+      "humidity_percent": 45.2,
+      "pressure_pa": 101325
+    },
+    {
+      "node_id": "elm11_002",
+      "timestamp": "2025-10-06T12:00:00Z",
+      "temperature_kelvin": 299.10,
+      "light_lux": 850
+    }
+  ]
+}
+```
+
+**Response:**
+```json
+{
+  "accepted": 2,
+  "rejected": 0,
+  "processing_time_ms": 45,
+  "results": [
+    {
+      "node_id": "pico_001",
+      "status": "processed",
+      "filtered_temperature": 298.60
+    },
+    {
+      "node_id": "elm11_002",
+      "status": "processed",
+      "filtered_temperature": 299.05
+    }
+  ]
+}
+```
+
+### `POST /bulk/oscillator-states`
+
+Retrieve current state for multiple nodes efficiently.
+
+**Request Body:**
+```json
+{
+  "node_ids": ["pico_001", "elm11_002", "pico_003"],
+  "detail_level": "standard"
+}
+```
+
+**Response:**
+```json
+{
+  "states": {
+    "pico_001": {
+      "circadian_time": 14.5,
+      "phase": 0.604,
+      "koa_metric": 0.67,
+      "status": "online"
+    },
+    "elm11_002": {
+      "circadian_time": 8.2,
+      "phase": 0.342,
+      "koa_metric": 0.23,
+      "status": "online"
+    },
+    "pico_003": {
+      "error": "node_offline",
+      "last_seen": "2025-10-06T10:30:00Z"
+    }
+  },
+  "timestamp": "2025-10-06T12:00:00Z"
+}
+```
+
+---
+
+## 10. Monitoring & Diagnostics
+
+### `GET /diagnostics/performance`
+
+Retrieve system performance metrics.
+
+**Response:**
+```json
+{
+  "server": {
+    "cpu_usage_percent": 45.2,
+    "memory_usage_mb": 1024,
+    "active_connections": 12,
+    "uptime_seconds": 86400
+  },
+  "oscillator": {
+    "average_integration_time_ms": 42,
+    "stability_index": 0.98,
+    "active_nodes": 5,
+    "total_simulations": 1250
+  },
+  "database": {
+    "connections_active": 8,
+    "query_latency_ms": 12.5,
+    "storage_used_gb": 25.6
+  },
+  "network": {
+    "requests_per_second": 45.2,
+    "error_rate_percent": 0.1,
+    "average_response_time_ms": 85
+  }
+}
+```
+
+### `GET /diagnostics/logs`
+
+Retrieve system logs with filtering.
+
+**Query Parameters:**
+- `level`: `debug` | `info` | `warning` | `error`
+- `node_id`: Filter by specific node
+- `start_time`: ISO 8601 timestamp
+- `end_time`: ISO 8601 timestamp
+- `limit`: Maximum entries (default: 100)
+
+**Response:**
+```json
+{
+  "logs": [
+    {
+      "timestamp": "2025-10-06T12:00:00Z",
+      "level": "info",
+      "node_id": "pico_001",
+      "message": "Sensor reading processed successfully",
+      "details": {
+        "temperature_kelvin": 298.65,
+        "processing_time_ms": 15
+      }
+    },
+    {
+      "timestamp": "2025-10-06T11:59:45Z",
+      "level": "warning",
+      "node_id": "elm11_002",
+      "message": "Network latency exceeded threshold",
+      "details": {
+        "latency_ms": 125,
+        "threshold_ms": 100
+      }
+    }
+  ],
+  "pagination": {
+    "has_next": true,
+    "next_cursor": "..."
+  }
+}
+```
+
+### `POST /diagnostics/health-check`
+
+Perform comprehensive health check on specific components.
+
+**Request Body:**
+```json
+{
+  "components": ["database", "oscillator", "network"],
+  "detailed": true
+}
+```
+
+**Response:**
+```json
+{
+  "overall_status": "healthy",
+  "checks": {
+    "database": {
+      "status": "healthy",
+      "latency_ms": 12,
+      "connections_available": 15
+    },
+    "oscillator": {
+      "status": "healthy",
+      "stability_check": "passed",
+      "active_nodes": 5
+    },
+    "network": {
+      "status": "warning",
+      "latency_ms": 95,
+      "packet_loss_percent": 0.05
+    }
+  },
+  "timestamp": "2025-10-06T12:00:00Z"
+}
+```
+
+---
+
+## 11. Configuration Management
+
+### `GET /config/templates`
+
+Retrieve configuration templates for different node types.
+
+**Query Parameters:**
+- `hardware_type`: `raspberry_pi_pico` | `elm11`
+- `runtime`: `micropython` | `lua`
+
+**Response:**
+```json
+{
+  "templates": {
+    "sensor_config": {
+      "bme280": {
+        "i2c_address": "0x76",
+        "mode": "normal",
+        "oversampling": {
+          "temperature": 2,
+          "humidity": 2,
+          "pressure": 2
+        },
+        "filter_coefficient": 2,
+        "standby_time": 1000
+      },
+      "kalman_filter": {
+        "process_noise": {
+          "temperature": 0.01,
+          "humidity": 0.02,
+          "pressure": 0.05
+        },
+        "measurement_noise": {
+          "temperature": 0.05,
+          "humidity": 0.1,
+          "pressure": 0.2
+        }
+      }
+    },
+    "network_config": {
+      "wifi": {
+        "ssid": "KaiABC_Network",
+        "security": "wpa2",
+        "reconnect_attempts": 5,
+        "reconnect_delay_ms": 1000
+      },
+      "mqtt": {
+        "broker": "mqtt.kaiabc.example.com",
+        "port": 8883,
+        "tls": true,
+        "keepalive_seconds": 60,
+        "qos": 1
+      }
+    },
+    "oscillator_config": {
+      "update_interval_ms": 5000,
+      "pwm_frequency_hz": 1000,
+      "buffer_size": 100,
+      "fallback_mode": "local_pwm"
+    }
+  }
+}
+```
+
+### `POST /config/validate`
+
+Validate configuration before deployment.
+
+**Request Body:**
+```json
+{
+  "node_id": "pico_001",
+  "config": {
+    "sensor": {
+      "bme280": {
+        "i2c_address": "0x76",
+        "oversampling": {
+          "temperature": 4,
+          "humidity": 4,
+          "pressure": 4
+        }
+      }
+    },
+    "network": {
+      "wifi": {
+        "ssid": "MyNetwork",
+        "password": "secret123"
+      }
+    }
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "valid": true,
+  "warnings": [
+    {
+      "field": "sensor.bme280.oversampling.temperature",
+      "message": "High oversampling may increase power consumption",
+      "suggestion": "Consider reducing to 2 for battery-powered applications"
+    }
+  ],
+  "optimizations": [
+    {
+      "field": "network.wifi",
+      "message": "WiFi credentials validated successfully"
+    }
+  ]
+}
+```
+
+---
+
+## Enhanced Error Handling
+
+### Detailed Error Response
+
+```json
+{
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Multiple validation errors found",
+    "details": {
+      "field_errors": [
+        {
+          "field": "temperature_kelvin",
+          "code": "OUT_OF_RANGE",
+          "message": "Temperature must be between 273.15 and 323.15 K",
+          "provided": 400.0,
+          "valid_range": [273.15, 323.15]
+        },
+        {
+          "field": "node_id",
+          "code": "INVALID_FORMAT",
+          "message": "Node ID must match pattern: ^[a-zA-Z0-9_-]+$",
+          "provided": "pico@001"
+        }
+      ],
+      "general_errors": [
+        {
+          "code": "RATE_LIMIT_EXCEEDED",
+          "message": "Too many requests. Please retry after 30 seconds"
+        }
+      ]
+    },
+    "timestamp": "2025-10-06T12:00:00Z",
+    "request_id": "req_abc123xyz789",
+    "path": "/v1/sensors/temperature",
+    "method": "POST",
+    "user_agent": "KaiABC-Pico/1.0.0",
+    "client_ip": "192.168.1.100"
+  }
+}
+```
+
+### Error Recovery Suggestions
+
+The API provides actionable recovery suggestions:
+
+```json
+{
+  "error": {
+    "code": "NODE_OFFLINE",
+    "message": "Sensor node is not responding",
+    "recovery_suggestions": [
+      {
+        "action": "check_power",
+        "description": "Verify node has adequate power supply",
+        "priority": "high"
+      },
+      {
+        "action": "check_network",
+        "description": "Ensure WiFi connectivity and signal strength",
+        "priority": "high"
+      },
+      {
+        "action": "restart_node",
+        "description": "Power cycle the device",
+        "priority": "medium"
+      },
+      {
+        "action": "update_firmware",
+        "description": "Check for firmware updates",
+        "priority": "low"
+      }
+    ]
+  }
+}
+```
+
+---
+
+## Testing Guidelines
+
+### API Testing Strategy
+
+1. **Unit Tests**: Individual endpoint functionality
+2. **Integration Tests**: End-to-end workflows
+3. **Load Tests**: Performance under high concurrency
+4. **Chaos Tests**: Fault tolerance and recovery
+
+### Test Data Management
+
+Use dedicated test nodes and data isolation:
+
+```bash
+# Create test node
+curl -X POST /v1/sensors/nodes \
+  -H "X-API-Key: test_key" \
+  -d '{"node_id": "test_pico_001", "name": "Test Node"}'
+
+# Run test suite
+npm test -- --environment=staging --node-id=test_pico_001
+```
+
+### Mock Data Endpoints
+
+For development and testing:
+
+- `GET /mock/sensor-data`: Generate synthetic sensor readings
+- `POST /mock/simulate-oscillator`: Simulate oscillator behavior
+- `GET /mock/test-scenarios`: Predefined test scenarios
+
+---
+
+## Deployment Considerations
+
+### Environment Configuration
+
+```yaml
+# config/production.yaml
+api:
+  version: "1.0.0"
+  host: "api.kaiabc.example.com"
+  port: 443
+  tls: true
+
+database:
+  type: "postgresql"
+  host: "db.kaiabc.example.com"
+  pool_size: 20
+  timeout_ms: 30000
+
+cache:
+  type: "redis"
+  host: "cache.kaiabc.example.com"
+  ttl_seconds: 3600
+
+monitoring:
+  enabled: true
+  metrics_endpoint: "/metrics"
+  health_endpoint: "/health"
+```
+
+### Scaling Strategy
+
+- **Horizontal Scaling**: Multiple API server instances behind load balancer
+- **Database Sharding**: Partition data by node_id for large deployments
+- **Caching**: Redis for frequently accessed oscillator states
+- **CDN**: Static assets and documentation
+
+### Security Hardening
+
+- **API Gateway**: Rate limiting, authentication, request validation
+- **WAF**: Web Application Firewall for attack prevention
+- **Encryption**: TLS 1.3, encrypted database connections
+- **Secrets Management**: Vault or similar for API keys and credentials
+
+---
+
+## Future Enhancements (v1.1.0)
+
+### Planned Features
+
+1. **GraphQL Support**: Flexible query interface for complex data requirements
+2. **Real-time Analytics**: Streaming analytics and anomaly detection
+3. **Machine Learning Integration**: Predictive maintenance and optimization
+4. **Multi-Protocol Support**: MQTT, AMQP, and gRPC alternatives
+5. **Federated Architecture**: Cross-region deployment support
+6. **Advanced Scheduling**: Cron-like job scheduling for experiments
+7. **Plugin Architecture**: Extensible sensor and actuator support
+
+### Backward Compatibility
+
+All v1.1.0 changes will maintain backward compatibility with v1.0.0 clients.
 
 ### Raspberry Pi Pico Client Integration
 
@@ -1388,6 +1934,19 @@ If network connectivity is lost, Raspberry Pi Pico and ELM11 nodes should:
 
 ## Versioning & Changelog
 
+**Version 1.0.1** (October 6, 2025)
+- Fixed all ESP32 references to use Raspberry Pi Pico and ELM11
+- Added comprehensive error handling with recovery suggestions
+- Added API versioning strategy with deprecation policy
+- Added cursor-based pagination for list endpoints
+- Added bulk operations for efficient data submission
+- Added monitoring and diagnostics endpoints
+- Added configuration management and validation
+- Added testing guidelines and mock data endpoints
+- Added deployment considerations and scaling strategy
+- Enhanced security with OAuth2 support
+- Added detailed performance monitoring
+
 **Version 1.0.0** (October 6, 2025)
 - Initial API specification
 - REST endpoints for core functionality
@@ -1395,12 +1954,12 @@ If network connectivity is lost, Raspberry Pi Pico and ELM11 nodes should:
 - Multi-node architecture support
 
 **Future Considerations (v1.1.0):**
+- GraphQL alternative endpoint for flexible queries
 - MQTT broker integration for high-volume sensor networks
-- GraphQL alternative endpoint
-- Batch simulation mode (run multiple parameter sets)
 - Machine learning model integration for adaptive entrainment
 - Redox sensor integration (LdpA pathway)
 - Multi-oscillator synchronization endpoints
+- Advanced analytics and predictive capabilities
 
 ---
 

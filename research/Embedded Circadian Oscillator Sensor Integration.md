@@ -10,7 +10,7 @@ The construction of a Minimum Viable Product (MVP) software implementation of th
 
 #### **Necessity of Dimensionality Reduction**
 
-The complete mechanistic understanding of the KaiABC clock involves the dynamic phosphorylation and structural transitions of KaiC hexamers, leading to the cyclic sequestration of the KaiA activator protein.1 Detailed molecular models tracking all unique phosphorylation states, complex formations, and monomer exchange processes often require the solution of several hundred coupled Ordinary Differential Equations (ODEs).3 Such high-dimensional systems are computationally prohibitive for real-time integration on microcontrollers (MCUs) such as the ESP32, where memory and floating-point processing speed are limited.4
+The complete mechanistic understanding of the KaiABC clock involves the dynamic phosphorylation and structural transitions of KaiC hexamers, leading to the cyclic sequestration of the KaiA activator protein.1 Detailed molecular models tracking all unique phosphorylation states, complex formations, and monomer exchange processes often require the solution of several hundred coupled Ordinary Differential Equations (ODEs).3 Such high-dimensional systems are computationally prohibitive for real-time integration on microcontrollers (MCUs) such as the Raspberry Pi Pico or ELM11, where memory and floating-point processing speed are limited.4
 
 #### **Adoption of Simplified ODE Framework**
 
@@ -69,18 +69,17 @@ where R is the gas constant, T is the temperature in Kelvin, Ai​ is the pre-ex
 
 The architecture must provide the necessary computational capacity to execute the stiff, non-linear ODE system in real time while interfacing with environmental sensors.
 
-### **II.1 MVP Hardware Platform Selection and Justification (ESP32)**
+### **II.1 MVP Hardware Platform Selection and Justification (Raspberry Pi Pico / ELM11)**
 
 #### **Processor Requirements and Floating-Point Arithmetic**
 
 Numerical integration of chemical kinetic ODEs relies heavily on floating-point arithmetic. Comparative benchmarks demonstrate that 8-bit microcontrollers, such as the Arduino Uno/Nano, are severely performance-limited, achieving only approximately 1300 integration steps per second using single precision.4 This performance profile makes them unsuitable for real-time simulation of complex, stiff biological systems.  
-The selection of the ESP32, a modern 32-bit microcontroller, is crucial. Its 32-bit architecture and potential hardware Floating-Point Unit (FPU) acceleration provide the required speed to execute complex Runge-Kutta schemes efficiently. The system must aim to achieve performance significantly higher than 7000 steps per second (the benchmark for a single-precision Due) to ensure that the entire entrainment loop, including sensor reading, filtering, and ODE integration, completes within the stringent real-time constraint of less than 100 ms per iteration.4
+The selection of the Raspberry Pi Pico (RP2040) or ELM11 boards provides the required computational capacity for the client-server architecture. While these devices lack hardware floating-point units, the client-server model offloads intensive ODE computation to a central server, allowing the embedded devices to focus on efficient sensor reading and local PWM control. The system must aim to achieve network communication latencies low enough to ensure that the entire entrainment loop, including sensor reading, data transmission, server processing, and command reception, completes within the stringent real-time constraint of less than 100 ms per iteration.4
 
 #### **Memory and Interface Capacity**
 
-The system requires adequate memory to host the MicroPython runtime 9, the compiled ODE solver core, the matrix operations necessary for advanced filtering (e.g., Kalman filter), and the historical logging of state variables. The ESP32 readily supports  
-4 MB of external PSRAM, which is sufficient for these computational and data storage demands.10  
-For environmental sensing, the BME280 or DHT22 sensors are easily integrated. The BME280, providing temperature (T), humidity (H), and pressure (P), communicates via the standard I²C protocol, which is natively supported by MicroPython's machine library, simplifying the hardware abstraction layer.11
+The system requires adequate memory to host the MicroPython (Pico) or Lua (ELM11) runtime, sensor data buffering, and local PWM control logic. The Raspberry Pi Pico provides 264KB SRAM and 2MB Flash, while ELM11 boards typically offer 128-512KB SRAM depending on the model. These capacities are sufficient for the lightweight client role, with the server handling all heavy computation and data storage.  
+For environmental sensing, the BME280 or DHT22 sensors are easily integrated. The BME280, providing temperature (T), humidity (H), and pressure (P), communicates via the standard I²C protocol, which is natively supported by MicroPython's machine library and Lua sensor libraries, simplifying the hardware abstraction layer.11
 
 ### **II.2 Numerical Integration Strategy for Constrained Environments**
 
@@ -92,19 +91,24 @@ The fundamental necessity of using an adaptive solver arises from the requiremen
 
 #### **Optimization for Performance**
 
-While MicroPython offers a productive scripting environment for the overall system logic 9, the time-critical component—the right-hand side function defining the coupled ODEs (  
-dtd\[X\]​) and the core adaptive solver algorithm—must be optimized for execution speed. It is advisable for the solver core to be implemented in an optimized, compiled language (such as C or C++) and tightly integrated with the MicroPython runtime (potentially via wrappers, similar to how goss wraps C++ libraries for Python desktop environments).12 This bare-metal optimization is required to ensure the system consistently meets the sub-  
+While MicroPython (Pico) and Lua (ELM11) offer productive scripting environments for the client-side logic, the time-critical component—the right-hand side function defining the coupled ODEs (  
+dtd\[X\]​) and the core adaptive solver algorithm—must be optimized for execution speed on the server. It is advisable for the server-side solver core to be implemented in an optimized, compiled language (such as C or C++) and tightly integrated with the server runtime (potentially via wrappers, similar to how goss wraps C++ libraries for Python desktop environments).12 This server-side optimization is required to ensure the system consistently meets the sub-  
 100 ms processing window necessary for real-time operation.
 
-### **II.3 Software Stack Design (MicroPython Focus)**
+### **II.3 Software Stack Design (Client-Server Focus)**
 
-The architecture is layered to maintain modularity and optimize performance:
+The architecture is layered to maintain modularity and optimize performance across the client-server model:
 
-1. **Hardware Abstraction Layer:** This foundation comprises the MicroPython runtime on the ESP32 bare metal, utilizing the machine module for direct interaction with I²C/GPIO pins, and the time module for precise scheduling and loop timing.9  
-2. **Sensor and Filter Layer:** This layer handles raw data acquisition from the BME280 and implements the digital filtering necessary to condition the noisy environmental inputs. This includes the execution of the Kalman filter routines (detailed in Section III.1).  
-3. **Kinetic Core Layer:** This is the compiled, high-speed ODE solver. It receives dynamically updated kinetic parameters (ki′​) from the Entrainment Module and performs the numerical integration to advance the state variables (concentrations) of the oscillator system.  
-4. **Entrainment Module Layer:** This module processes the smoothed temperature input, calculates the current phase of the oscillator, and applies the Entrainment Transfer Functions (ETFs) to generate the new, modulated kinetic parameters (ki′​).  
-5. **Output Translation Layer:** This final layer translates the internal biochemical state (specifically the concentration profiles of phosphorylated KaiC species) into the external, actionable signal necessary to drive the practical application (Section IV).
+1. **Client Hardware Abstraction Layer:** This foundation comprises the MicroPython (Raspberry Pi Pico) or Lua (ELM11) runtime on the embedded devices, utilizing the respective machine libraries for direct interaction with I²C/GPIO pins, and the time module for precise scheduling and loop timing.9  
+2. **Client Sensor Layer:** This layer handles raw data acquisition from the BME280 and implements basic local filtering and buffering for transmission to the server.  
+3. **Network Communication Layer:** Lightweight HTTP/REST or MQTT protocols for sensor data transmission and command reception, with automatic fallback to local PWM control during network outages.  
+4. **Server Kinetic Core Layer:** This is the compiled, high-speed ODE solver running on the server. It receives dynamically updated kinetic parameters (ki′​) from the Entrainment Module and performs the numerical integration to advance the state variables (concentrations) of the oscillator system.  
+5. **Server Entrainment Module Layer:** This module processes the smoothed temperature input from multiple clients, calculates the current phase of each oscillator, and applies the Entrainment Transfer Functions (ETFs) to generate the new, modulated kinetic parameters (ki′​).  
+6. **Server Output Translation Layer:** This final layer translates the internal biochemical state (specifically the concentration profiles of phosphorylated KaiC species) into the external, actionable signal commands sent back to clients for PWM control (Section IV).
+
+## **III. Dynamic Environmental Entrainment and Modulation Kinetics**
+
+Achieving functional entrainment requires a systematic approach to conditioning sensor data and mapping it, via sophisticated transfer functions, onto the kinetic parameters of the ODE model in a biologically relevant manner.
 
 ## **III. Dynamic Environmental Entrainment and Modulation Kinetics**
 
@@ -240,10 +244,13 @@ Table 3: MVP Embedded System Performance Targets and Constraints
 
 | Component/Metric | Constraint Requirement | Justification/Implementation Note |
 | :---- | :---- | :---- |
-| **Processor Type** | 32-bit Core with FPU support | Required for efficient floating-point ODE calculation.4 |
+| **Client Processor Type** | Raspberry Pi Pico (RP2040) or ELM11 (ARM Cortex-M3/M4) | Lightweight devices for sensor reading and PWM control; no FPU required due to server-side computation.4 |
+| **Server Processor Type** | 64-bit CPU with FPU support | Required for efficient floating-point ODE calculation on server. |
 | **Solver Type** | Adaptive Runge-Kutta Fehlberg (RKF32/RKF45) | Essential for stable integration of stiff ODEs with minimal computational overhead.12 |
 | **Max Iteration Time (Integration)** | \<100 ms | Target for real-time sensing loop, allowing a maximum of 5 seconds sensor update rate.8 |
-| **Required PSRAM** | ≥4 MB | For MicroPython runtime, ODE state history, and Kalman filter matrices.10 |
+| **Network Latency** | \<50 ms round-trip | Critical for maintaining real-time entrainment loop across client-server architecture. |
+| **Client Memory** | ≥128 KB SRAM (ELM11) or 264 KB (Pico) | For runtime, sensor buffering, and local PWM control. |
+| **Server Memory** | ≥4 GB RAM | For ODE state history, Kalman filter matrices, and multi-client coordination. |
 | **Entrainment Resolution** | Phase shift ΔΦ≤1 hour per temperature step | Defines the required sensitivity of the Entrainment Transfer Function (ETF) and numerical precision.14 |
 
 ## **V. Synthesis and Future Development Trajectories**
@@ -266,15 +273,15 @@ The current MVP focuses solely on thermal entrainment. However, biological clock
 A critical enhancement involves integrating environmental sensors that act as proxies for the redox state of the cell (e.g., Electrochemical O₂ sensors). The biological mechanism utilizes the LdpA protein, which contains redox-active iron-sulfur clusters, to sense the cellular redox state.16 LdpA is known to interact with the clock proteins, specifically modulating the abundance and sensitivity of CikA and KaiA.16  
 This suggests a future expansion where the measured environmental oxygen level is mapped, via a new, modular ETF, onto the kinetic parameters that govern KaiA or CikA dynamics, providing a non-thermal entrainment pathway. This integration moves the system toward a more comprehensive, bio-inspired timing device, acknowledging that biological entrainment is rarely governed by a single cue.16
 
-#### **Multi-Core Optimization**
+#### **Multi-Node Coordination and Server Optimization**
 
-The ESP32 platform offers a dual-core processor architecture. For future high-performance requirements, the system should be optimized by dedicating specific computational loads to each core. One core would be reserved exclusively for the time-critical, floating-point intensive tasks—namely, the C/C++ ODE integration core and the Kalman filter routines—ensuring minimal latency and maximum speed. The second core would handle the non-time-critical operations, such as MicroPython I/O, network communication, sensor polling, and management of the output interface. This parallelization is necessary to maintain real-time performance as the complexity of the ODE model or the number of sensor inputs increases.  
+The client-server architecture enables coordination across multiple Raspberry Pi Pico and ELM11 nodes. For high-performance server requirements, the system should be optimized by dedicating specific computational loads to server resources. The server would be reserved exclusively for the time-critical, floating-point intensive tasks—namely, the C/C++ ODE integration core and the Kalman filter routines—ensuring minimal latency and maximum speed. Client devices handle the non-time-critical operations, such as sensor polling, network communication, and local PWM control. This distribution is necessary to maintain real-time performance as the complexity of the ODE model or the number of sensor inputs increases.  
 The modular architecture of the Entrainment Transfer Functions (ETFs) is designed precisely to accommodate this expansion. New environmental inputs, whether light (lux sensor data mapped to CikA/LdpA stability) or redox state (O₂ sensor), can be seamlessly integrated into the existing control loop by defining new, independent ETFs that map these non-thermal inputs to different sets of biologically relevant kinetic parameters (ki​).15
 
 ## **Conclusions and Recommendations**
 
-The proposed MVP architecture successfully addresses the challenge of creating a real-time, entrainable biological oscillator simulation on a constrained embedded platform. The system leverages essential compromises: selecting a simplified, low-dimensional ODE model to ensure computational viability, while simultaneously retaining the specific kinetic parameters necessary to model and intentionally override the mechanism of temperature compensation.  
-The selection of the ESP32 platform and the mandate for an adaptive Runge-Kutta Fehlberg solver are dictated by the need for high-speed floating-point stability in a stiff, non-linear system. The implementation of a Kalman filter is paramount for maintaining system stability by mitigating environmental sensor noise before inputting the data into the highly sensitive kinetic model.  
+The proposed MVP architecture successfully addresses the challenge of creating a real-time, entrainable biological oscillator simulation using a distributed client-server model with Raspberry Pi Pico and ELM11 embedded devices. The system leverages essential compromises: selecting a simplified, low-dimensional ODE model to ensure computational viability on the server, while simultaneously retaining the specific kinetic parameters necessary to model and intentionally override the mechanism of temperature compensation.  
+The selection of the Raspberry Pi Pico (MicroPython) and ELM11 (Lua) platforms for client devices, combined with server-side ODE computation, provides the required computational capacity for high-speed floating-point stability in a stiff, non-linear system. The implementation of a Kalman filter on the server is paramount for maintaining system stability by mitigating environmental sensor noise before inputting the data into the highly sensitive kinetic model.  
 The critical functional design element is the set of Entrainment Transfer Functions (ETFs), which transform stable temperature compensation into tunable entrainment sensitivity. This is achieved by modeling the system as a sensitized mutant that intentionally violates the biological constraints governing stability, allowing the external temperature signal to directly correlate with the oscillation frequency and phase.  
 It is recommended that development focus initially on the rigorous calibration of the non-linear transfer functions s(T^) and g(T^) (ETF 2 and 3\) to accurately reproduce the expected Phase Response Curves (PRCs). Subsequent development should prioritize the expansion of the MVP to include a modular redox-sensing ETF pathway, providing the multi-input entrainment capability necessary for achieving full biological fidelity and relevance in applied synchronization technologies.
 
