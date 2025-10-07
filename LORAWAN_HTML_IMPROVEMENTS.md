@@ -14,6 +14,35 @@ Transformed all ASCII diagrams in the LoRaWAN compatibility analysis HTML docume
 **Before:** 35 lines of ASCII box-drawing characters (┌─┐│└)  
 **After:** Multi-layered visual architecture with color-coded components
 
+### 2. **Network Topology Diagrams** (Lines 547-760)
+**Before:** 3 ASCII topology diagrams with box-drawing characters  
+**After:** Professional network topology visualizations
+
+**Star Topology:**
+- Blue gradient background with centered gateway
+- Vertical connection lines showing uplink
+- 4 node cards at bottom with icons
+- Clean, hierarchical layout
+
+**Mesh Topology:**
+- Green gradient background
+- 4 nodes positioned in square formation
+- Center indicator showing "Full Mesh" connections
+- Legend badges for P2P links
+
+**Hybrid Topology:**
+- Purple/pink gradient background
+- Gateway at top with LoRaWAN connections
+- Two node clusters with local P2P indicators
+- Color-coded legend (LoRaWAN uplink vs Local P2P)
+- "Recommended" badge
+
+---
+
+### 3. **Architecture Diagram (Original)** (Lines 246-377)
+**Before:** 35 lines of ASCII box-drawing characters (┌─┐│└)  
+**After:** Multi-layered visual architecture with color-coded components
+
 **Key Features:**
 - 🎨 4 distinct colored layers (Blue → Purple → Green → Orange)
 - 📦 Component cards with icons and descriptions
@@ -156,9 +185,10 @@ Transformed all ASCII diagrams in the LoRaWAN compatibility analysis HTML docume
 
 | Metric | Before | After | Improvement |
 |--------|--------|-------|-------------|
-| **Lines of ASCII art** | 78 | 0 | -100% |
-| **Visual components** | 0 | 6 major diagrams | +∞ |
-| **Color usage** | Minimal | 7 distinct palettes | Significantly enhanced |
+| **Lines of ASCII art** | 93+ | 0 | -100% |
+| **Visual components** | 0 | 9 major diagrams | +∞ |
+| **Network topology visualizations** | 3 ASCII | 3 professional | Complete |
+| **Color usage** | Minimal | 10+ distinct palettes | Significantly enhanced |
 | **Mobile responsiveness** | Poor | Excellent | ✓ |
 | **Information density** | Low | High | ✓ |
 | **Scan-ability** | Difficult | Easy | ✓ |

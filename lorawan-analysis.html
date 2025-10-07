@@ -452,7 +452,7 @@
                             <div class="bg-gradient-to-r from-indigo-100 to-purple-100 rounded p-3 text-center">
                                 <div class="text-sm text-gray-700 mb-1">Total Payload Size</div>
                                 <div class="text-2xl font-bold text-indigo-900">10 bytes</div>
-                                <div class="text-xs text-gray-600 mt-1">Well within LoRaWAN 51-byte minimum ✓</div>
+                                <div class="text-xs text-gray-600 mt-1">Well within LoRaWAN 51-byte maximum ✓</div>
                             </div>
                         </div>
                     </div>
@@ -549,13 +549,46 @@ typedef struct {<br>
             <div class="grid md:grid-cols-1 gap-6">
                 <div class="metric-card">
                     <h3 class="text-lg font-semibold text-[#8a7962] mb-4">Option 1: Star Topology (Traditional LoRaWAN)</h3>
-                    <div class="bg-gray-100 p-4 rounded text-sm mb-4">
-     Gateway<br>
-        │<br>
-   ┌────┴────┐<br>
-   │         │<br>
- Node1     Node2 ... NodeN
+                    
+                    <!-- Star Topology Visualization -->
+                    <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg mb-4">
+                        <div class="flex flex-col items-center">
+                            <!-- Gateway at top -->
+                            <div class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg px-6 py-3 shadow-lg mb-6">
+                                <div class="text-2xl mb-1">🌐</div>
+                                <div class="font-bold text-center">Gateway</div>
+                            </div>
+                            
+                            <!-- Connecting lines -->
+                            <div class="flex gap-4 items-start justify-center mb-4">
+                                <div class="w-0.5 h-12 bg-blue-400"></div>
+                                <div class="w-0.5 h-12 bg-blue-400"></div>
+                                <div class="w-0.5 h-12 bg-blue-400"></div>
+                                <div class="w-0.5 h-12 bg-blue-400"></div>
+                            </div>
+                            
+                            <!-- Nodes at bottom -->
+                            <div class="flex gap-4 justify-center flex-wrap">
+                                <div class="bg-white border-2 border-blue-400 rounded-lg px-4 py-2 shadow text-center">
+                                    <div class="text-xl">📡</div>
+                                    <div class="text-xs font-semibold text-gray-700">Node 1</div>
+                                </div>
+                                <div class="bg-white border-2 border-blue-400 rounded-lg px-4 py-2 shadow text-center">
+                                    <div class="text-xl">📡</div>
+                                    <div class="text-xs font-semibold text-gray-700">Node 2</div>
+                                </div>
+                                <div class="bg-white border-2 border-blue-400 rounded-lg px-4 py-2 shadow text-center">
+                                    <div class="text-xl">📡</div>
+                                    <div class="text-xs font-semibold text-gray-700">Node 3</div>
+                                </div>
+                                <div class="bg-white border-2 border-blue-400 rounded-lg px-4 py-2 shadow text-center">
+                                    <div class="text-xl">⋯</div>
+                                    <div class="text-xs font-semibold text-gray-700">Node N</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    
                     <div class="grid md:grid-cols-3 gap-4 text-sm">
                         <div>
                             <h4 class="font-semibold text-green-700">Pros</h4>
@@ -582,11 +615,56 @@ typedef struct {<br>
 
                 <div class="metric-card">
                     <h3 class="text-lg font-semibold text-[#8a7962] mb-4">Option 2: Mesh Topology (LoRa Peer-to-Peer Mode)</h3>
-                    <div class="bg-gray-100 p-4 rounded text-sm mb-4">
-Node1 ←→ Node2<br>
-  ↓  ╲   ╱  ↓<br>
-Node3 ←→ Node4
+                    
+                    <!-- Mesh Topology Visualization -->
+                    <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-lg mb-4">
+                        <div class="relative flex items-center justify-center" style="min-height: 180px;">
+                            <!-- Nodes positioned in a square -->
+                            <div class="absolute top-0 left-12">
+                                <div class="bg-gradient-to-br from-green-400 to-emerald-500 text-white rounded-lg px-4 py-2 shadow-lg text-center">
+                                    <div class="text-xl">📡</div>
+                                    <div class="text-xs font-bold">Node 1</div>
+                                </div>
+                            </div>
+                            
+                            <div class="absolute top-0 right-12">
+                                <div class="bg-gradient-to-br from-green-400 to-emerald-500 text-white rounded-lg px-4 py-2 shadow-lg text-center">
+                                    <div class="text-xl">📡</div>
+                                    <div class="text-xs font-bold">Node 2</div>
+                                </div>
+                            </div>
+                            
+                            <div class="absolute bottom-0 left-12">
+                                <div class="bg-gradient-to-br from-green-400 to-emerald-500 text-white rounded-lg px-4 py-2 shadow-lg text-center">
+                                    <div class="text-xl">📡</div>
+                                    <div class="text-xs font-bold">Node 3</div>
+                                </div>
+                            </div>
+                            
+                            <div class="absolute bottom-0 right-12">
+                                <div class="bg-gradient-to-br from-green-400 to-emerald-500 text-white rounded-lg px-4 py-2 shadow-lg text-center">
+                                    <div class="text-xl">📡</div>
+                                    <div class="text-xs font-bold">Node 4</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Connection indicators in center -->
+                            <div class="text-center">
+                                <div class="text-sm text-green-700 font-semibold bg-white/80 rounded px-3 py-2 border-2 border-green-400">
+                                    ↔ Full Mesh<br>
+                                    <span class="text-xs">All nodes connected</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Visual connection legend -->
+                        <div class="mt-4 flex justify-center gap-4 flex-wrap text-xs">
+                            <span class="bg-white border border-green-400 rounded px-2 py-1">↔ Bidirectional</span>
+                            <span class="bg-white border border-green-400 rounded px-2 py-1">P2P Links</span>
+                            <span class="bg-white border border-green-400 rounded px-2 py-1">No Infrastructure</span>
+                        </div>
                     </div>
+                    
                     <div class="grid md:grid-cols-3 gap-4 text-sm">
                         <div>
                             <h4 class="font-semibold text-green-700">Pros</h4>
@@ -614,15 +692,81 @@ Node3 ←→ Node4
 
                 <div class="metric-card">
                     <h3 class="text-lg font-semibold text-[#8a7962] mb-4">Option 3: Hybrid (LoRaWAN + Local P2P)</h3>
-                    <div class="bg-gray-100 p-4 rounded text-sm mb-4">
-   Gateway (global sync)<br>
-       │<br>
-   ┌───┴───┐<br>
-   │       │<br>
- Node1 ←→ Node2 (local P2P)<br>
-   │       │<br>
- Node3 ←→ Node4 (local P2P)
+                    
+                    <!-- Hybrid Topology Visualization -->
+                    <div class="bg-gradient-to-br from-purple-50 to-pink-50 p-6 rounded-lg mb-4">
+                        <div class="flex flex-col items-center">
+                            <!-- Gateway at top -->
+                            <div class="bg-gradient-to-r from-purple-500 to-pink-600 text-white rounded-lg px-6 py-3 shadow-lg mb-2">
+                                <div class="text-2xl mb-1">🌐</div>
+                                <div class="font-bold text-center">Gateway</div>
+                                <div class="text-xs text-center opacity-90">(Global Sync)</div>
+                            </div>
+                            
+                            <!-- LoRaWAN connections -->
+                            <div class="flex gap-8 items-start justify-center mb-4">
+                                <div class="w-0.5 h-12 bg-purple-400"></div>
+                                <div class="w-0.5 h-12 bg-purple-400"></div>
+                            </div>
+                            
+                            <!-- Node clusters with P2P connections -->
+                            <div class="flex gap-12 justify-center">
+                                <!-- Left cluster -->
+                                <div class="relative" style="width: 140px; height: 140px;">
+                                    <div class="absolute top-0 left-1/2 -translate-x-1/2">
+                                        <div class="bg-gradient-to-br from-purple-400 to-pink-500 text-white rounded-lg px-3 py-2 shadow text-center">
+                                            <div class="text-lg">📡</div>
+                                            <div class="text-xs font-bold">Node 1</div>
+                                        </div>
+                                    </div>
+                                    <div class="absolute bottom-0 left-1/2 -translate-x-1/2">
+                                        <div class="bg-gradient-to-br from-purple-400 to-pink-500 text-white rounded-lg px-3 py-2 shadow text-center">
+                                            <div class="text-lg">📡</div>
+                                            <div class="text-xs font-bold">Node 3</div>
+                                        </div>
+                                    </div>
+                                    <!-- P2P indicator -->
+                                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                                        <div class="text-lg text-pink-600">↕</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Right cluster -->
+                                <div class="relative" style="width: 140px; height: 140px;">
+                                    <div class="absolute top-0 left-1/2 -translate-x-1/2">
+                                        <div class="bg-gradient-to-br from-purple-400 to-pink-500 text-white rounded-lg px-3 py-2 shadow text-center">
+                                            <div class="text-lg">📡</div>
+                                            <div class="text-xs font-bold">Node 2</div>
+                                        </div>
+                                    </div>
+                                    <div class="absolute bottom-0 left-1/2 -translate-x-1/2">
+                                        <div class="bg-gradient-to-br from-purple-400 to-pink-500 text-white rounded-lg px-3 py-2 shadow text-center">
+                                            <div class="text-lg">📡</div>
+                                            <div class="text-xs font-bold">Node 4</div>
+                                        </div>
+                                    </div>
+                                    <!-- P2P indicator -->
+                                    <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                                        <div class="text-lg text-pink-600">↕</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Connection legend -->
+                            <div class="mt-6 flex justify-center gap-4 flex-wrap text-xs">
+                                <span class="bg-purple-100 border border-purple-400 rounded px-2 py-1">
+                                    <span class="text-purple-700">│</span> LoRaWAN Uplink
+                                </span>
+                                <span class="bg-pink-100 border border-pink-400 rounded px-2 py-1">
+                                    <span class="text-pink-700">↕</span> Local P2P
+                                </span>
+                                <span class="bg-white border-2 border-purple-500 rounded px-2 py-1 font-semibold text-purple-900">
+                                    ✓ Recommended
+                                </span>
+                            </div>
+                        </div>
                     </div>
+                    
                     <div class="grid md:grid-cols-3 gap-4 text-sm">
                         <div>
                             <h4 class="font-semibold text-green-700">Best of Both Worlds</h4>
