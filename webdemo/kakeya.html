@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kakeya Conjecture & Oscillator Synchronization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Neutrals -->
+    <!-- Application Structure Plan: A single-page, scrolling application with a fixed sidebar navigation. This structure guides the user from foundational concepts (Kakeya, Kuramoto), through the key environmental factor (temperature conversion), to the formal research plan, and finally to an interactive simulation dashboard. This non-linear but guided approach is chosen for usability, allowing experts to jump to the simulation while enabling newcomers to build understanding sequentially. It prioritizes exploring the problem's dynamics over a static report format. -->
+    <!-- Visualization & Content Choices: 
+    - Report Info: Temperature dependence of KaiABC. Goal: Explain σ_T to σ_ω conversion. Viz: Interactive line chart (Chart.js) with sliders for Q10 and σ_T. Interaction: Sliders update chart and calculated σ_ω value. Justification: Makes the crucial parameter conversion tangible and interactive. Library: Chart.js (Canvas).
+    - Report Info: Core synchronization problem. Goal: Demonstrate effect of N, K, σ_ω. Viz: A dashboard combining a Canvas animation of oscillators on a circle, a Chart.js line plot of Order Parameter vs. Coupling, and numeric readouts. Interaction: Sliders for N, K, σ_ω control all elements simultaneously. Justification: Provides a holistic, intuitive feel for the system's dynamics, directly connecting abstract parameters to the visual outcome of synchronization. Library: Chart.js, custom Canvas rendering.
+    - Report Info: 10-step research plan. Goal: Present the plan clearly. Viz: HTML/CSS accordion. Interaction: Click to expand. Justification: Keeps the UI clean and scannable.
+    - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-link.active {
+            background-color: #4A5568;
+            color: #FFFFFF;
+            transform: translateX(4px);
+        }
+        .param-card {
+            background-color: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 6px;
+            cursor: pointer;
+            background: #E2E8F0;
+            border-radius: 3px;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #4A5568;
+            cursor: pointer;
+            margin-top: -7px;
+        }
+        input[type=range]:focus::-webkit-slider-runnable-track {
+            background: #CBD5E0;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FDFBF8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A0AEC0;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex">
+    <nav class="hidden md:block w-64 bg-gray-50 border-r border-gray-200 p-6 fixed h-full">
+        <h2 class="text-lg font-bold text-gray-800 mb-6">Research Explorer</h2>
+        <ul class="space-y-2" id="desktop-nav">
+            <li><a href="#introduction" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Introduction</a></li>
+            <li><a href="#concepts" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Core Concepts</a></li>
+            <li><a href="#environment" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Environmental Factors</a></li>
+            <li><a href="#protocol" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Research Protocol</a></li>
+            <li><a href="#simulation" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Interactive Simulation</a></li>
+            <li><a href="#alternatives" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Alternative Frameworks</a></li>
+            <li><a href="#implications" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Implications</a></li>
+        </ul>
+    </nav>
+
+    <main class="flex-1 md:ml-64 p-4 sm:p-6 lg:p-10">
+        <div class="max-w-4xl mx-auto space-y-16">
+
+            <section id="introduction">
+                <div class="p-8 bg-white rounded-xl border border-gray-200">
+                    <h1 class="text-3xl font-bold text-gray-900 mb-4">Connecting the Kakeya Conjecture to Distributed Biological Oscillator Synchronization</h1>
+                    <p class="text-gray-600 text-lg mb-2">A Research Initiative</p>
+                    <p class="text-gray-700 leading-relaxed">
+                        This project explores a novel intersection of pure mathematics and applied engineering. We aim to answer a fundamental question: Using techniques from the recently proven Kakeya Conjecture, what is the minimal "volume" of phase space that a network of distributed biological oscillators must explore to achieve global synchronization? This has direct applications for creating robust, decentralized IoT networks that use biological clocks (like the KaiABC system) instead of traditional digital timekeeping, especially when facing diverse environmental conditions.
+                    </p>
+                </div>
+            </section>
+
+            <section id="concepts">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Core Concepts</h2>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="param-card">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-2">Kakeya Conjecture</h3>
+                        <p class="text-gray-600">In essence, this mathematical theorem provides a lower bound on the size (or "volume") of a set in space that can contain a line segment pointing in every possible direction. Its proof provides powerful tools for geometric measure theory, which can be adapted to analyze the trajectories of oscillators in a high-dimensional phase space.</p>
+                    </div>
+                    <div class="param-card">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-2">Kuramoto Model</h3>
+                        <p class="text-gray-600">A foundational mathematical model describing the synchronization of many coupled oscillators. Each oscillator has a natural frequency, and they interact in a way that pulls their phases together. The model helps predict when a network will synchronize based on coupling strength and frequency diversity.</p>
+                    </div>
+                    <div class="param-card">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-2">KaiABC Oscillator</h3>
+                        <p class="text-gray-600">A temperature-compensated circadian clock found in cyanobacteria. It's a biochemical oscillator driven by protein phosphorylation cycles. Its robustness and well-understood dynamics make it an ideal candidate for implementation in software for decentralized IoT clock synchronization.</p>
+                    </div>
+                    <div class="param-card">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-2">Phase Space Volume</h3>
+                        <p class="text-gray-600">For a network of N oscillators, the "phase space" is an N-dimensional space where each point represents the complete state of the network (the phase of every oscillator). The "volume" required for synchronization refers to the measure of the attractor basin—the set of initial states from which the system will naturally converge to a synchronized state.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="environment">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Environmental Factors: From Temperature to Frequency</h2>
+                <p class="text-gray-700 leading-relaxed mb-8">
+                    A key challenge is environmental heterogeneity. IoT devices in different locations will experience different temperatures. The KaiABC oscillator's period is temperature-dependent, a relationship quantified by the Q10 temperature coefficient. This section lets you explore how variance in temperature (σ_T) across the network translates into variance in the oscillators' natural frequencies (σ_ω), a critical parameter for synchronization.
+                </p>
+                <div class="param-card">
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <div class="mb-6">
+                                <label for="q10-slider" class="block font-medium text-gray-700 mb-2">Q10 Coefficient: <span id="q10-value" class="font-bold text-gray-900">2.2</span></label>
+                                <input id="q10-slider" type="range" min="1.0" max="3.0" value="2.2" step="0.1" class="w-full">
+                            </div>
+                            <div>
+                                <label for="temp-variance-slider" class="block font-medium text-gray-700 mb-2">Temperature Variance (σ_T): <span id="temp-variance-value" class="font-bold text-gray-900">5.0</span> °C</label>
+                                <input id="temp-variance-slider" type="range" min="0.1" max="10.0" value="5.0" step="0.1" class="w-full">
+                            </div>
+                            <div class="mt-8 p-4 bg-gray-50 rounded-lg">
+                                <p class="text-gray-600">Resulting Frequency Variance (σ_ω):</p>
+                                <p id="omega-variance-value" class="text-2xl font-bold text-gray-900">0.021 rad/hr</p>
+                            </div>
+                        </div>
+                        <div class="chart-container h-64 md:h-80">
+                            <canvas id="tempPeriodChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="protocol">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Structured Research Protocol</h2>
+                <div id="accordion-container" class="space-y-3">
+                </div>
+            </section>
+            
+            <section id="simulation">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Interactive Synchronization Simulation</h2>
+                <p class="text-gray-700 leading-relaxed mb-8">
+                    This dashboard simulates the core dynamics of the Kuramoto model. Adjust the number of oscillators (N), their coupling strength (K), and the frequency variance (σ_ω) to see how these factors influence the network's ability to synchronize. The goal is to find the "critical coupling" (K_c) needed to overcome the frequency differences and achieve a coherent state. Kakeya-derived techniques could provide tighter bounds on the phase space volume these oscillators must explore to find this synchronized state.
+                </p>
+                <div class="grid lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 space-y-6 param-card">
+                        <div>
+                            <label for="osc-n-slider" class="block font-medium text-gray-700 mb-2">Number of Oscillators (N): <span id="osc-n-value" class="font-bold text-gray-900">50</span></label>
+                            <input id="osc-n-slider" type="range" min="5" max="200" value="50" step="1">
+                        </div>
+                         <div>
+                            <label for="osc-k-slider" class="block font-medium text-gray-700 mb-2">Coupling Strength (K): <span id="osc-k-value" class="font-bold text-gray-900">1.00</span></label>
+                            <input id="osc-k-slider" type="range" min="0" max="5" value="1.0" step="0.05">
+                        </div>
+                        <div>
+                            <label for="osc-omega-slider" class="block font-medium text-gray-700 mb-2">Frequency Variance (σ_ω): <span id="osc-omega-value" class="font-bold text-gray-900">0.50</span></label>
+                            <input id="osc-omega-slider" type="range" min="0" max="2" value="0.5" step="0.01">
+                        </div>
+                        <button id="reset-sim-btn" class="w-full bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-800 transition">Reset Simulation</button>
+                    </div>
+                    <div class="lg:col-span-2 param-card">
+                         <div class="w-full aspect-square bg-gray-100 rounded-lg">
+                             <canvas id="oscillator-canvas"></canvas>
+                         </div>
+                    </div>
+                </div>
+                <div class="mt-6 param-card">
+                    <h3 class="font-semibold text-lg text-gray-900 mb-4">Synchronization Analysis</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="p-4 bg-gray-50 rounded-lg">
+                           <p class="text-gray-600">Order Parameter (R):</p>
+                           <p id="order-parameter-value" class="text-2xl font-bold text-gray-900">0.00</p>
+                           <p class="text-sm text-gray-500">(0 = Unsynchronized, 1 = Fully Synchronized)</p>
+                        </div>
+                         <div class="p-4 bg-gray-50 rounded-lg">
+                           <p class="text-gray-600">Critical Coupling (K_c):</p>
+                           <p id="critical-coupling-value" class="text-2xl font-bold text-gray-900">0.64</p>
+                           <p class="text-sm text-gray-500">Theoretical K needed to start sync</p>
+                        </div>
+                    </div>
+                    <p class="text-gray-700 mt-4">The Kakeya conjecture may refine our understanding of the <span class="font-semibold">Hausdorff dimension</span> of the attractor basin, providing a tighter lower bound on the "phase space volume" required for convergence, especially under noisy, real-world conditions.</p>
+                </div>
+            </section>
+            
+            <section id="alternatives">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Alternative Frameworks & Open Questions</h2>
+                <p class="text-gray-700 leading-relaxed mb-8">While the Kakeya conjecture offers a promising geometric perspective, it's crucial to consider other mathematical frameworks that could also address the synchronization volume challenge. Each offers a different lens through which to view the problem.</p>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="param-card">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-2">Stochastic Processes</h3>
+                        <p class="text-gray-600">Models each oscillator as a noisy process, focusing on probabilities and statistical convergence rather than deterministic geometry.</p>
+                    </div>
+                    <div class="param-card">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-2">Information Geometry</h3>
+                        <p class="text-gray-600">Uses tools from differential geometry to define a "distance" between different states of synchronization in the phase space, recasting the problem as finding the shortest path to coherence.</p>
+                    </div>
+                    <div class="param-card">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-2">Algebraic Topology</h3>
+                        <p class="text-gray-600">Uses concepts like persistent homology to analyze the "shape" of the phase space data over time, identifying when stable synchronization clusters emerge and persist.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="implications">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Practical Implications</h2>
+                <div class="space-y-4 text-gray-700 leading-relaxed">
+                    <p>The outcomes of this research have significant practical implications for the future of decentralized systems. By establishing theoretical bounds on the requirements for synchronization, we can inform more efficient and robust designs for:</p>
+                    <ul class="list-disc list-inside space-y-2 pl-4">
+                        <li><strong>Network Architecture:</strong> Determining optimal network topologies (e.g., mesh vs. star) that minimize the phase space exploration needed for synchronization, potentially reducing communication overhead.</li>
+                        <li><strong>Synchronization Algorithms:</strong> Designing new distributed protocols that guide oscillators towards the synchronization manifold more efficiently, reducing convergence time and energy consumption.</li>
+                        <li><strong>Sensor Sampling Strategies:</strong> Using insights from harmonic analysis, potentially improved by Kakeya, to define optimal sensor reading frequencies to entrain the biological clocks without collecting redundant data.</li>
+                    </ul>
+                </div>
+            </section>
+        </div>
+    </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const researchProtocolSteps = [
+        { title: "1. Foundational Connection", content: "Establish the foundational connection between the Kakeya Conjecture/Kakeya maximal function estimates and geometric measure theory applied to dynamical systems, focusing on dimensional bounds on sets containing curves with all directions." },
+        { title: "2. Mathematical Framework Definition", content: "Define the mathematical framework for the system: the Kuramoto/KaiABC coupled oscillator model under heterogeneous environmental forcing (temperature variation) and characterize the resulting synchronization manifold in phase space (Hausdorff or Minkowski dimension)." },
+        { title: "3. Literature Search for Kakeya Links", content: "Search specifically for papers (2014-2025) that cite either (a) Katz & Tao's 2014 Kakeya program or (b) Wang & Zahl's 2025 proof in the context of coupled oscillator synchronization, particularly research linking Kakeya-type bounds (including the 'graininess' concept) to the minimal dimensional measure ('volume') of the phase space attractor basin." },
+        { title: "4. Environmental Heterogeneity Analysis", content: "Investigate how environmental heterogeneity (temperature-dependent period changes, Q10 effects, Arrhenius kinetics) affects the topology and stability of the synchronization attractor, and how this is mathematically expressed in terms of basin size and fractal dimension." },
+        { title: "5. Harmonic Analysis Implications", content: "Research the implications of the Kakeya proof for uncertainty principles and time-frequency localization in harmonic analysis, and how these improvements might lead to new signal processing tools for optimal sensor sampling strategies and filtering of non-stationary biological rhythms." },
+        { title: "6. Biological Precedents Search", content: "Search for biological and mathematical physics precedents, specifically papers that connect geometric measure theory, phase space dimensions, or fractal attractors to synchronization in natural biological networks (e.g., SCN neurons, cyanobacteria, fireflies)." },
+        { title: "7. Exploration of Alternative Frameworks", content: "Briefly explore alternative mathematical frameworks (e.g., Stochastic Processes, Information Geometry via Fisher metric, Algebraic Topology/Persistent Homology) to contextualize whether the Kakeya approach is optimal." },
+        { title: "8. Derivation of Mathematical Bounds", content: "Identify existing bounds or derive order-of-magnitude estimates relating the number of oscillators (N), coupling strength (K), environmental variance (σ_T), and the minimal phase space volume/dimension (d_min) for synchronization." },
+        { title: "9. Translation to Practical Implications", content: "Translate the theoretical bounds and geometric insights into practical implications for IoT network architecture: optimal coupling topologies, distributed synchronization algorithms, and sensor data acquisition strategies." },
+        { title: "10. Synthesis and Conclusion", content: "Synthesize findings, present the calculated minimal volume/dimensional measure (or existing bounds), evaluate whether Kakeya theory provides meaningful constraints for this application, and identify key open mathematical problems." }
+    ];
+
+    const accordionContainer = document.getElementById('accordion-container');
+    researchProtocolSteps.forEach((step, index) => {
+        const item = document.createElement('div');
+        item.className = 'border border-gray-200 rounded-lg bg-white';
+        item.innerHTML = `
+            <button class="accordion-toggle w-full text-left p-4 font-semibold text-gray-800 flex justify-between items-center hover:bg-gray-50">
+                <span>${step.title}</span>
+                <span class="transform transition-transform duration-300 text-gray-500">▼</span>
+            </button>
+            <div class="accordion-content px-4 pb-4 text-gray-600">
+                <p>${step.content}</p>
+            </div>
+        `;
+        accordionContainer.appendChild(item);
+    });
+
+    accordionContainer.addEventListener('click', (e) => {
+        const toggle = e.target.closest('.accordion-toggle');
+        if (toggle) {
+            const content = toggle.nextElementSibling;
+            const icon = toggle.querySelector('span:last-child');
+            if (content.style.maxHeight) {
+                content.style.maxHeight = null;
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                document.querySelectorAll('.accordion-content').forEach(c => c.style.maxHeight = null);
+                document.querySelectorAll('.accordion-toggle span:last-child').forEach(i => i.style.transform = 'rotate(0deg)');
+                content.style.maxHeight = content.scrollHeight + "px";
+                icon.style.transform = 'rotate(180deg)';
+            }
+        }
+    });
+
+
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-link');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').substring(1) === entry.target.id) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, { rootMargin: '-50% 0px -50% 0px', threshold: 0 });
+
+    sections.forEach(section => observer.observe(section));
+
+
+    let tempPeriodChart;
+    const q10Slider = document.getElementById('q10-slider');
+    const tempVarianceSlider = document.getElementById('temp-variance-slider');
+    const q10Value = document.getElementById('q10-value');
+    const tempVarianceValue = document.getElementById('temp-variance-value');
+    const omegaVarianceValue = document.getElementById('omega-variance-value');
+
+    function updateEnvironmentCalculations() {
+        const q10 = parseFloat(q10Slider.value);
+        const sigma_T = parseFloat(tempVarianceSlider.value);
+        q10Value.textContent = q10.toFixed(1);
+        tempVarianceValue.textContent = sigma_T.toFixed(1);
+
+        const T_ref = 24;
+        const temp_ref = 30;
+
+        const temps = Array.from({ length: 21 }, (_, i) => 20 + i);
+        const periods = temps.map(t => T_ref * Math.pow(q10, (temp_ref - t) / 10));
+        
+        const dT_dTemp_at_ref = -T_ref * (Math.log(q10) / 10);
+        const d_omega_dT = - (2 * Math.PI / (T_ref * T_ref)) * dT_dTemp_at_ref;
+        const sigma_omega = Math.abs(d_omega_dT * sigma_T);
+
+        omegaVarianceValue.textContent = `${sigma_omega.toFixed(3)} rad/hr`;
+
+        if (tempPeriodChart) {
+            tempPeriodChart.data.datasets[0].data = periods;
+            tempPeriodChart.update();
+        }
+    }
+
+    function createTempPeriodChart() {
+        const ctx = document.getElementById('tempPeriodChart').getContext('2d');
+        const temps = Array.from({ length: 21 }, (_, i) => 20 + i);
+        tempPeriodChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: temps,
+                datasets: [{
+                    label: 'Oscillator Period (hours)',
+                    data: [],
+                    borderColor: '#4A5568',
+                    backgroundColor: 'rgba(74, 85, 104, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: { title: { display: true, text: 'Temperature (°C)' } },
+                    y: { title: { display: true, text: 'Period (hr)' } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+    }
+
+    q10Slider.addEventListener('input', updateEnvironmentCalculations);
+    tempVarianceSlider.addEventListener('input', updateEnvironmentCalculations);
+    
+    createTempPeriodChart();
+    updateEnvironmentCalculations();
+
+    const nSlider = document.getElementById('osc-n-slider');
+    const kSlider = document.getElementById('osc-k-slider');
+    const omegaSlider = document.getElementById('osc-omega-slider');
+    const nValue = document.getElementById('osc-n-value');
+    const kValue = document.getElementById('osc-k-value');
+    const omegaValue = document.getElementById('osc-omega-value');
+    const orderParamValue = document.getElementById('order-parameter-value');
+    const criticalCouplingValue = document.getElementById('critical-coupling-value');
+    const resetButton = document.getElementById('reset-sim-btn');
+    
+    const canvas = document.getElementById('oscillator-canvas');
+    const ctx = canvas.getContext('2d');
+
+    let N, K, sigma_omega_sim;
+    let phases, omegas;
+    let animationFrameId;
+
+    function resizeCanvas() {
+        const size = Math.min(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
+        canvas.width = size;
+        canvas.height = size;
+    }
+
+    function initializeSimulation() {
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+
+        N = parseInt(nSlider.value);
+        K = parseFloat(kSlider.value);
+        sigma_omega_sim = parseFloat(omegaSlider.value);
+
+        nValue.textContent = N;
+        kValue.textContent = K.toFixed(2);
+        omegaValue.textContent = sigma_omega_sim.toFixed(2);
+        
+        const Kc = (2 / Math.PI) * (2 * sigma_omega_sim); 
+        criticalCouplingValue.textContent = Kc.toFixed(2);
+        
+        phases = Array.from({ length: N }, () => Math.random() * 2 * Math.PI);
+        omegas = Array.from({ length: N }, () => (Math.random() - 0.5) * 2 * sigma_omega_sim);
+        
+        animationFrameId = requestAnimationFrame(animate);
+    }
+    
+    function animate() {
+        const dt = 0.01;
+        const nextPhases = new Array(N);
+
+        let sum_sin = 0, sum_cos = 0;
+        for(let i=0; i<N; ++i) {
+            sum_sin += Math.sin(phases[i]);
+            sum_cos += Math.cos(phases[i]);
+        }
+        
+        const order_R = Math.sqrt(sum_sin*sum_sin + sum_cos*sum_cos) / N;
+        orderParamValue.textContent = order_R.toFixed(3);
+        
+        for (let i = 0; i < N; i++) {
+            let coupling_sum = 0;
+            for (let j = 0; j < N; j++) {
+                coupling_sum += Math.sin(phases[j] - phases[i]);
+            }
+            const d_theta = (omegas[i] + (K / N) * coupling_sum) * dt;
+            nextPhases[i] = (phases[i] + d_theta) % (2 * Math.PI);
+        }
+        phases = nextPhases;
+        
+        drawOscillators();
+        animationFrameId = requestAnimationFrame(animate);
+    }
+    
+    function drawOscillators() {
+        const width = canvas.width;
+        const height = canvas.height;
+        const radius = width * 0.4;
+        const centerX = width / 2;
+        const centerY = height / 2;
+
+        ctx.clearRect(0, 0, width, height);
+        
+        ctx.strokeStyle = '#E2E8F0';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.stroke();
+
+        for (let i = 0; i < N; i++) {
+            const x = centerX + radius * Math.cos(phases[i]);
+            const y = centerY + radius * Math.sin(phases[i]);
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, 2 * Math.PI);
+            ctx.fillStyle = '#4A5568';
+            ctx.fill();
+        }
+    }
+    
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+        drawOscillators();
+    });
+
+    nSlider.addEventListener('input', () => { nValue.textContent = nSlider.value; initializeSimulation(); });
+    kSlider.addEventListener('input', () => { K = parseFloat(kSlider.value); kValue.textContent = K.toFixed(2); });
+    omegaSlider.addEventListener('input', () => {
+        sigma_omega_sim = parseFloat(omegaSlider.value);
+        omegaValue.textContent = sigma_omega_sim.toFixed(2);
+        const Kc = (2 / Math.PI) * (2 * sigma_omega_sim);
+        criticalCouplingValue.textContent = Kc.toFixed(2);
+        initializeSimulation();
+    });
+    resetButton.addEventListener('click', initializeSimulation);
+
+    resizeCanvas();
+    initializeSimulation();
+});
+</script>
+
+<footer class="bg-gray-100 border-t border-gray-200 mt-12 py-6">
+    <div class="max-w-6xl mx-auto px-6">
+        <div class="text-center text-gray-600">
+            <p class="mb-2">For detailed research methodology and mathematical foundations:</p>
+            <a href="../research/Geometric Constraints on Phase Space Exploration for Distributed Biological Oscillators.md" 
+               class="text-blue-600 hover:text-blue-800 underline font-medium">
+                Geometric Constraints on Phase Space Exploration for Distributed Biological Oscillators
+            </a>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>
