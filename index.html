@@ -58,12 +58,21 @@
 </head>
 <body class="flex flex-col md:flex-row">
 
-    <nav class="w-full md:w-64 bg-[#f0e9dd] border-b md:border-b-0 md:border-r border-[#dcd1ba] p-4 md:fixed md:h-screen">
+    <nav class="w-full md:w-64 bg-[#f0e9dd] border-b md:border-b-0 md:border-r border-[#dcd1ba] p-4 md:fixed md:h-screen overflow-y-auto">
         <h1 class="text-xl font-bold text-[#6d5d47] mb-6">KaiABC Project</h1>
         <ul class="space-y-2">
             <li><a href="#overview" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7]">Overview</a></li>
+            <li class="border-t border-[#dcd1ba] pt-2 mt-2">
+                <p class="text-xs font-semibold text-[#8a7962] px-2 mb-1">Research & Demos</p>
+            </li>
+            <li><a href="webdemo/kakeya.html" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7] text-blue-700 font-medium">🔬 Interactive Web Demo</a></li>
+            <li><a href="research/Geometric Constraints on Phase Space Exploration for Distributed Biological Oscillators.md" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7] text-sm">📄 Research Paper</a></li>
+            <li><a href="webdemo/NUMERICAL_IMPROVEMENTS.md" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7] text-sm">📊 Numerical Methods</a></li>
+            <li><a href="LoRaWAN_COMPATIBILITY.md" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7] text-sm">📡 LoRaWAN Analysis</a></li>
+            <li class="border-t border-[#dcd1ba] pt-2 mt-2">
+                <p class="text-xs font-semibold text-[#8a7962] px-2 mb-1">Original MVP Plan</p>
+            </li>
             <li><a href="#simulation" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7]">Core Model Simulation</a></li>
-            <li><a href="webdemo/kakeya.html" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7]">Kakeya Demo</a></li>
             <li><a href="#roadmap" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7]">MVP Roadmap</a></li>
             <li><a href="#architecture" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7]">System Architecture</a></li>
             <li><a href="#questions" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7]">Key Questions</a></li>
@@ -75,7 +84,35 @@
         
         <section id="overview" class="mb-12">
             <h2 class="text-3xl font-bold text-[#6d5d47] mb-4">Project Overview</h2>
-            <p class="mb-6 text-lg text-gray-700">This project defines a Minimum Viable Product (MVP) for a software implementation of the cyanobacterial KaiABC circadian clock. The core goal is to create a robust oscillator model that uses real-time environmental sensor data to modulate its behavior and drive practical applications.</p>
+            <p class="mb-6 text-lg text-gray-700">This project explores distributed biological oscillator synchronization through the lens of the <strong>Kakeya Conjecture</strong> (Wang & Zahl, 2025). We connect cutting-edge geometric measure theory to practical IoT applications using the cyanobacterial KaiABC circadian clock as a temperature-compensated oscillator. The research demonstrates how fundamental mathematics can inform ultra-low-power distributed timing systems.</p>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                <h3 class="font-semibold text-blue-900 mb-2">🎯 Current Project Status</h3>
+                <p class="text-blue-800 text-sm">The project has evolved beyond the original MVP plan to include comprehensive mathematical research, interactive web demonstrations with advanced numerical methods (RK4 integration, Monte Carlo validation), and quantitative predictions for real-world IoT deployment scenarios.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
+                    <div class="text-3xl mb-2">📐</div>
+                    <h4 class="font-bold text-green-900 text-sm mb-1">Kakeya Conjecture Application</h4>
+                    <p class="text-xs text-green-700">Novel connection between 3D geometric measure theory and N-oscillator phase space</p>
+                </div>
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
+                    <div class="text-3xl mb-2">🧮</div>
+                    <h4 class="font-bold text-blue-900 text-sm mb-1">Advanced Numerics</h4>
+                    <p class="text-xs text-blue-700">RK4 integration, Monte Carlo validation, adaptive temperature-frequency conversion</p>
+                </div>
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg border border-purple-200">
+                    <div class="text-3xl mb-2">⚡</div>
+                    <h4 class="font-bold text-purple-900 text-sm mb-1">Ultra-Low Power</h4>
+                    <p class="text-xs text-purple-700">1.5 kbps bandwidth, 246-year theoretical battery life with Q10=1.1 compensation</p>
+                </div>
+                <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
+                    <div class="text-3xl mb-2">🎮</div>
+                    <h4 class="font-bold text-orange-900 text-sm mb-1">Interactive Demo</h4>
+                    <p class="text-xs text-orange-700">Real-time sync visualization, basin volume prediction, Q10 comparison tables</p>
+                </div>
+            </div>
             
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -110,6 +147,84 @@
                         <li class="flex items-start"><span class="text-blue-500 font-bold mr-2">?</span> <strong>Could Have:</strong> Machine Learning, Population Sync, Smart Home Integration.</li>
                     </ul>
                 </div>
+            </div>
+        </section>
+
+        <section id="research" class="mb-12">
+            <h2 class="text-3xl font-bold text-[#6d5d47] mb-4">Research Highlights</h2>
+            <p class="mb-6 text-lg text-gray-700">This project bridges fundamental mathematics and practical engineering through novel application of the Kakeya Conjecture to distributed oscillator networks.</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold text-[#8a7962] mb-3">Mathematical Foundation</h3>
+                    <ul class="space-y-2 text-gray-700 text-sm">
+                        <li class="flex items-start">
+                            <span class="text-blue-600 font-bold mr-2">•</span>
+                            <span><strong>Kakeya Conjecture (Wang & Zahl, 2025):</strong> Provides dimensional bounds on phase space exploration for N-oscillator systems</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-600 font-bold mr-2">•</span>
+                            <span><strong>Basin Volume Scaling:</strong> V_basin ∝ (1 - 1.5σ_ω/⟨ω⟩)^N predicts synchronization difficulty</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-600 font-bold mr-2">•</span>
+                            <span><strong>Critical Coupling:</strong> K_c = 2σ_ω for all-to-all networks (Kuramoto model)</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-blue-600 font-bold mr-2">•</span>
+                            <span><strong>Sync Time:</strong> τ = ln(N/ε)/(K - K_c) cycles to reach R > 0.95</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                    <h3 class="text-xl font-semibold text-[#8a7962] mb-3">Quantitative Predictions</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-xs">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-2 text-left">Scenario</th>
+                                    <th class="p-2 text-right">Q10</th>
+                                    <th class="p-2 text-right">σ_ω</th>
+                                    <th class="p-2 text-right">Basin</th>
+                                    <th class="p-2 text-right">Battery</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-700">
+                                <tr class="border-t">
+                                    <td class="p-2 font-medium">Ideal</td>
+                                    <td class="p-2 text-right">1.0</td>
+                                    <td class="p-2 text-right">0.000</td>
+                                    <td class="p-2 text-right text-green-700 font-bold">100%</td>
+                                    <td class="p-2 text-right">∞</td>
+                                </tr>
+                                <tr class="border-t bg-green-50">
+                                    <td class="p-2 font-medium">Realistic</td>
+                                    <td class="p-2 text-right">1.1</td>
+                                    <td class="p-2 text-right">0.021</td>
+                                    <td class="p-2 text-right text-green-700 font-bold">28%</td>
+                                    <td class="p-2 text-right font-bold">246 yr</td>
+                                </tr>
+                                <tr class="border-t">
+                                    <td class="p-2 font-medium">Uncompensated</td>
+                                    <td class="p-2 text-right">2.2</td>
+                                    <td class="p-2 text-right">0.168</td>
+                                    <td class="p-2 text-right text-red-700 font-bold">0.0001%</td>
+                                    <td class="p-2 text-right">8 yr</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">For N=10 oscillators, σ_T=±5°C. Basin = fraction of initial conditions achieving sync. Battery life based on 6 msgs/day @ 1.5 kbps.</p>
+                </div>
+            </div>
+            
+            <div class="bg-gradient-to-r from-indigo-50 to-purple-50 p-6 rounded-lg border border-indigo-200">
+                <h3 class="text-xl font-semibold text-indigo-900 mb-3">🚀 Try the Interactive Demo</h3>
+                <p class="text-gray-700 mb-4">Explore the full interactive simulation with real-time parameter adjustments, Monte Carlo validation, and visual synchronization dynamics.</p>
+                <a href="webdemo/kakeya.html" class="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-md transition-colors">
+                    Launch Web Demo →
+                </a>
             </div>
         </section>
 
@@ -201,17 +316,38 @@
 
         <section id="architecture" class="mb-12">
             <h2 class="text-3xl font-bold text-[#6d5d47] mb-4">System Architecture</h2>
-            <p class="mb-6 text-lg text-gray-700">The proposed architecture prioritizes a balance of performance, cost, and development speed. An embedded microcontroller serves as the brain, running the simulation on-device (at the edge) for a self-contained system.</p>
+            <p class="mb-6 text-lg text-gray-700">The system supports multiple deployment options from WiFi prototypes to long-range LoRaWAN networks. All variants run the KaiABC oscillator on-device (edge computation) for autonomous operation.</p>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                <h3 class="font-semibold text-blue-900 mb-2">📡 LoRaWAN: Recommended for Production</h3>
+                <p class="text-blue-800 text-sm mb-2">LoRaWAN provides <strong>1,027-year battery life</strong> (4.2× better than WiFi), <strong>5-10 km range</strong>, and <strong>sub-$20/node</strong> cost. Perfect for distributed oscillator networks.</p>
+                <a href="LoRaWAN_COMPATIBILITY.md" class="text-blue-600 underline hover:text-blue-800 text-sm font-medium">View detailed LoRaWAN analysis →</a>
+            </div>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                    <h3 class="text-xl font-semibold text-[#8a7962] mb-4">Hardware Stack</h3>
-                    <ul class="list-disc list-inside space-y-2 text-gray-700">
-                        <li><strong>Platform:</strong> ESP32 or Raspberry Pi Zero ($5-15)</li>
-                        <li><strong>Sensor:</strong> BME280 Temperature/Humidity/Pressure ($8-15)</li>
-                        <li><strong>Output:</strong> Basic LED, resistors, breadboard</li>
-                        <li><strong>Power:</strong> USB or battery</li>
-                        <li class="font-semibold">Total Hardware Budget: &lt;$50</li>
-                    </ul>
+                    <h3 class="text-xl font-semibold text-[#8a7962] mb-4">Hardware Options</h3>
+                    <div class="space-y-4">
+                        <div class="border-l-4 border-green-500 pl-3">
+                            <p class="font-bold text-green-900">LoRaWAN (Recommended)</p>
+                            <ul class="list-disc list-inside space-y-1 text-sm text-gray-700 mt-1">
+                                <li><strong>MCU:</strong> STM32WL or ESP32-C3 + RFM95W</li>
+                                <li><strong>Range:</strong> 5-10 km (SF10)</li>
+                                <li><strong>Power:</strong> 12 mJ/msg → 1,027 yr battery</li>
+                                <li><strong>Cost:</strong> $19/node + $200 gateway</li>
+                            </ul>
+                        </div>
+                        <div class="border-l-4 border-blue-500 pl-3">
+                            <p class="font-bold text-blue-900">WiFi/MQTT (Prototyping)</p>
+                            <ul class="list-disc list-inside space-y-1 text-sm text-gray-700 mt-1">
+                                <li><strong>MCU:</strong> ESP32 or Raspberry Pi Zero</li>
+                                <li><strong>Range:</strong> 50-100 m</li>
+                                <li><strong>Power:</strong> 50 mJ/msg → 246 yr battery</li>
+                                <li><strong>Cost:</strong> $13/node + router</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4"><strong>Common:</strong> BME280 sensor ($8), 18650 battery ($5), IP67 enclosure ($3)</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
                     <h3 class="text-xl font-semibold text-[#8a7962] mb-4">Software & Data</h3>
