@@ -58,6 +58,7 @@
         }
         input[type=range] {
             -webkit-appearance: none;
+            appearance: none;
             width: 100%;
             background: transparent;
         }
@@ -95,21 +96,23 @@
         }
     </style>
 </head>
-<body class="min-h-screen flex">
-    <nav class="hidden md:block w-64 bg-gray-50 border-r border-gray-200 p-6 fixed h-full">
-        <h2 class="text-lg font-bold text-gray-800 mb-6">Research Explorer</h2>
-        <ul class="space-y-2" id="desktop-nav">
-            <li><a href="#introduction" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Introduction</a></li>
-            <li><a href="#concepts" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Core Concepts</a></li>
-            <li><a href="#environment" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Environmental Factors</a></li>
-            <li><a href="#protocol" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Research Protocol</a></li>
-            <li><a href="#simulation" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Interactive Simulation</a></li>
-            <li><a href="#alternatives" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Alternative Frameworks</a></li>
-            <li><a href="#implications" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200">Implications</a></li>
-        </ul>
-    </nav>
+<body class="min-h-screen">
+    <div class="flex min-h-screen">
+        <nav class="hidden md:block w-64 bg-gray-50 border-r border-gray-200 p-6 fixed h-full" role="navigation" aria-label="Main navigation">
+            <h2 class="text-lg font-bold text-gray-800 mb-6">Research Explorer</h2>
+            <ul class="space-y-2" id="desktop-nav">
+                <li><a href="#introduction" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200" aria-label="Go to Introduction section">Introduction</a></li>
+                <li><a href="#concepts" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200" aria-label="Go to Core Concepts section">Core Concepts</a></li>
+                <li><a href="#environment" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200" aria-label="Go to Environmental Factors section">Environmental Factors</a></li>
+                <li><a href="#protocol" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200" aria-label="Go to Research Protocol section">Research Protocol</a></li>
+                <li><a href="#simulation" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200" aria-label="Go to Interactive Simulation section">Interactive Simulation</a></li>
+                <li><a href="#alternatives" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200" aria-label="Go to Alternative Frameworks section">Alternative Frameworks</a></li>
+                <li><a href="#implications" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200" aria-label="Go to Implications section">Implications</a></li>
+                <li><a href="#validation" class="nav-link block p-2 rounded-lg text-gray-600 hover:bg-gray-200" aria-label="Go to Validation section">Validation</a></li>
+            </ul>
+        </nav>
 
-    <main class="flex-1 md:ml-64 p-4 sm:p-6 lg:p-10">
+        <main class="flex-1 md:ml-64 p-4 sm:p-6 lg:p-10">
         <div class="max-w-4xl mx-auto space-y-16">
 
             <section id="introduction">
@@ -154,11 +157,11 @@
                         <div>
                             <div class="mb-6">
                                 <label for="q10-slider" class="block font-medium text-gray-700 mb-2">Q10 Coefficient: <span id="q10-value" class="font-bold text-gray-900">2.2</span></label>
-                                <input id="q10-slider" type="range" min="1.0" max="3.0" value="2.2" step="0.1" class="w-full">
+                                <input id="q10-slider" type="range" min="1.0" max="3.0" value="2.2" step="0.1" class="w-full" aria-label="Q10 temperature coefficient slider" aria-valuemin="1.0" aria-valuemax="3.0" aria-valuenow="2.2">
                             </div>
                             <div>
                                 <label for="temp-variance-slider" class="block font-medium text-gray-700 mb-2">Temperature Variance (σ_T): <span id="temp-variance-value" class="font-bold text-gray-900">5.0</span> °C</label>
-                                <input id="temp-variance-slider" type="range" min="0.1" max="10.0" value="5.0" step="0.1" class="w-full">
+                                <input id="temp-variance-slider" type="range" min="0.1" max="10.0" value="5.0" step="0.1" class="w-full" aria-label="Temperature variance slider in degrees Celsius" aria-valuemin="0.1" aria-valuemax="10.0" aria-valuenow="5.0">
                             </div>
                             <div class="mt-8 p-4 bg-gray-50 rounded-lg">
                                 <p class="text-gray-600">Resulting Frequency Variance (σ_ω):</p>
@@ -187,27 +190,44 @@
                     <div class="lg:col-span-1 space-y-6 param-card">
                         <div>
                             <label for="osc-n-slider" class="block font-medium text-gray-700 mb-2">Number of Oscillators (N): <span id="osc-n-value" class="font-bold text-gray-900">50</span></label>
-                            <input id="osc-n-slider" type="range" min="5" max="200" value="50" step="1">
+                            <input id="osc-n-slider" type="range" min="5" max="200" value="50" step="1" aria-label="Number of oscillators" aria-valuemin="5" aria-valuemax="200" aria-valuenow="50">
                         </div>
                          <div>
                             <label for="osc-k-slider" class="block font-medium text-gray-700 mb-2">Coupling Strength (K): <span id="osc-k-value" class="font-bold text-gray-900">1.00</span></label>
-                            <input id="osc-k-slider" type="range" min="0" max="5" value="1.0" step="0.05">
+                            <input id="osc-k-slider" type="range" min="0" max="5" value="1.0" step="0.05" aria-label="Coupling strength between oscillators" aria-valuemin="0" aria-valuemax="5" aria-valuenow="1.0">
                         </div>
                         <div>
                             <label for="osc-omega-slider" class="block font-medium text-gray-700 mb-2">Frequency Variance (σ_ω): <span id="osc-omega-value" class="font-bold text-gray-900">0.50</span></label>
-                            <input id="osc-omega-slider" type="range" min="0" max="2" value="0.5" step="0.01">
+                            <input id="osc-omega-slider" type="range" min="0" max="2" value="0.5" step="0.01" aria-label="Frequency variance among oscillators" aria-valuemin="0" aria-valuemax="2" aria-valuenow="0.5">
                         </div>
-                        <button id="reset-sim-btn" class="w-full bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-800 transition">Reset Simulation</button>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="reset-sim-btn" class="bg-gray-700 text-white font-semibold py-2 px-4 rounded-lg hover:bg-gray-800 transition">Reset</button>
+                            <button id="export-data-btn" class="bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition">Export CSV</button>
+                        </div>
+                        <button id="share-config-btn" class="w-full mt-2 bg-green-600 text-white font-semibold py-2 px-4 rounded-lg hover:bg-green-700 transition text-sm">Share Configuration</button>
+                        
+                        <div class="mt-4">
+                            <label class="block font-medium text-gray-700 mb-2 text-sm">Scenario Presets:</label>
+                            <select id="preset-selector" class="w-full p-2 border border-gray-300 rounded-lg text-sm">
+                                <option value="">Custom</option>
+                                <option value="ideal">Ideal KaiABC (Q10=1.0, N=10)</option>
+                                <option value="realistic">Realistic KaiABC (Q10=1.1, N=20)</option>
+                                <option value="uncompensated">Uncompensated (Q10=2.2, N=10)</option>
+                                <option value="large-network">Large Network (N=100)</option>
+                                <option value="weak-coupling">Weak Coupling Challenge</option>
+                                <option value="strong-heterogeneity">Strong Heterogeneity</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="lg:col-span-2 param-card">
                          <div class="w-full aspect-square bg-gray-100 rounded-lg">
-                             <canvas id="oscillator-canvas"></canvas>
+                             <canvas id="oscillator-canvas" role="img" aria-label="Visualization of oscillators on a circle showing their current phases"></canvas>
                          </div>
                     </div>
                 </div>
                 <div class="mt-6 param-card">
                     <h3 class="font-semibold text-lg text-gray-900 mb-4">Synchronization Analysis</h3>
-                    <div class="grid md:grid-cols-2 gap-6">
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
                         <div class="p-4 bg-gray-50 rounded-lg">
                            <p class="text-gray-600">Order Parameter (R):</p>
                            <p id="order-parameter-value" class="text-2xl font-bold text-gray-900">0.00</p>
@@ -219,6 +239,22 @@
                            <p class="text-sm text-gray-500">Theoretical K needed to start sync</p>
                         </div>
                     </div>
+                    
+                    <div class="grid lg:grid-cols-2 gap-6 mb-4">
+                        <div>
+                            <h4 class="font-medium text-gray-800 mb-2">Order Parameter Evolution</h4>
+                            <div class="chart-container h-48">
+                                <canvas id="orderParameterChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="font-medium text-gray-800 mb-2">Phase Space Projection (2D)</h4>
+                            <div class="w-full aspect-square bg-gray-100 rounded-lg" style="max-height: 250px;">
+                                <canvas id="phaseSpaceCanvas"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <p class="text-gray-700 mt-4">The Kakeya conjecture may refine our understanding of the <span class="font-semibold">Hausdorff dimension</span> of the attractor basin, providing a tighter lower bound on the "phase space volume" required for convergence, especially under noisy, real-world conditions.</p>
                 </div>
             </section>
@@ -253,12 +289,85 @@
                     </ul>
                 </div>
             </section>
+            
+            <section id="validation">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Experimental Validation Framework</h2>
+                <p class="text-gray-700 leading-relaxed mb-6">
+                    To validate the theoretical predictions, we propose a structured experimental approach combining simulation, hardware testbeds, and mathematical analysis.
+                </p>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="param-card">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-3">Phase 1: Computational Validation</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Monte Carlo sampling of T^N initial conditions</li>
+                            <li>• Measure basin volume vs. Q10 and σ_T</li>
+                            <li>• Test dimensional scaling hypothesis (N=5 to 100)</li>
+                            <li>• Compare K_c predictions to simulation results</li>
+                            <li>• Timeline: 2-3 months</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="param-card">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-3">Phase 2: Hardware Testbed</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Deploy 10-50 Raspberry Pi Pico devices</li>
+                            <li>• Implement KaiABC oscillator in MicroPython</li>
+                            <li>• Measure actual bandwidth requirements</li>
+                            <li>• Test various network topologies</li>
+                            <li>• Timeline: 4-6 months</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="param-card">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-3">Phase 3: Mathematical Analysis</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Formalize Kakeya → dynamical systems mapping</li>
+                            <li>• Derive rigorous dimensional bounds</li>
+                            <li>• Publish peer-reviewed results</li>
+                            <li>• Collaborate with experts in measure theory</li>
+                            <li>• Timeline: 6-12 months</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="param-card">
+                        <h3 class="font-semibold text-lg text-gray-900 mb-3">Success Metrics</h3>
+                        <ul class="space-y-2 text-gray-600">
+                            <li>• Basin volume prediction error <10%</li>
+                            <li>• K_c measurement within 20% of theory</li>
+                            <li>• Bandwidth <2 kbps per device achieved</li>
+                            <li>• Convergence time <10 periods for N=10</li>
+                            <li>• Robustness to 20% node failures</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-6 p-6 bg-amber-50 border border-amber-200 rounded-lg">
+                    <h4 class="font-semibold text-gray-900 mb-2">Open Research Questions</h4>
+                    <ul class="space-y-1 text-gray-700">
+                        <li>1. Can Kakeya techniques provide tighter bounds than traditional Lyapunov analysis?</li>
+                        <li>2. How do network delays and packet loss affect the dimensional requirements?</li>
+                        <li>3. What is the optimal sensor sampling strategy given bandwidth constraints?</li>
+                        <li>4. Can we extend this framework to non-identical oscillators (heterogeneous parameters)?</li>
+                        <li>5. How does the approach scale to N>100 devices in realistic IoT deployments?</li>
+                    </ul>
+                </div>
+            </section>
         </div>
     </main>
+    </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+// ====================
+// KAKEYA OSCILLATOR SYNCHRONIZATION WEB APPLICATION
+// Modular JavaScript Architecture
+// ====================
 
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // ====================
+    // MODULE: Research Protocol Accordion
+    // ====================
     const researchProtocolSteps = [
         { title: "1. Foundational Connection", content: "Establish the foundational connection between the Kakeya Conjecture/Kakeya maximal function estimates and geometric measure theory applied to dynamical systems, focusing on dimensional bounds on sets containing curves with all directions." },
         { title: "2. Mathematical Framework Definition", content: "Define the mathematical framework for the system: the Kuramoto/KaiABC coupled oscillator model under heterogeneous environmental forcing (temperature variation) and characterize the resulting synchronization manifold in phase space (Hausdorff or Minkowski dimension)." },
@@ -390,6 +499,9 @@ document.addEventListener('DOMContentLoaded', () => {
     createTempPeriodChart();
     updateEnvironmentCalculations();
 
+    // ====================
+    // MODULE: Oscillator Simulation with Enhanced Visualizations
+    // ====================
     const nSlider = document.getElementById('osc-n-slider');
     const kSlider = document.getElementById('osc-k-slider');
     const omegaSlider = document.getElementById('osc-omega-slider');
@@ -399,18 +511,73 @@ document.addEventListener('DOMContentLoaded', () => {
     const orderParamValue = document.getElementById('order-parameter-value');
     const criticalCouplingValue = document.getElementById('critical-coupling-value');
     const resetButton = document.getElementById('reset-sim-btn');
+    const exportButton = document.getElementById('export-data-btn');
+    const shareButton = document.getElementById('share-config-btn');
+    const presetSelector = document.getElementById('preset-selector');
     
     const canvas = document.getElementById('oscillator-canvas');
     const ctx = canvas.getContext('2d');
+    
+    const phaseSpaceCanvas = document.getElementById('phaseSpaceCanvas');
+    const phaseCtx = phaseSpaceCanvas ? phaseSpaceCanvas.getContext('2d') : null;
 
     let N, K, sigma_omega_sim;
     let phases, omegas;
     let animationFrameId;
+    let orderParameterHistory = [];
+    let orderParameterChart;
 
     function resizeCanvas() {
         const size = Math.min(canvas.parentElement.clientWidth, canvas.parentElement.clientHeight);
         canvas.width = size;
         canvas.height = size;
+        
+        if (phaseSpaceCanvas) {
+            const psSize = Math.min(phaseSpaceCanvas.parentElement.clientWidth, phaseSpaceCanvas.parentElement.clientHeight);
+            phaseSpaceCanvas.width = psSize;
+            phaseSpaceCanvas.height = psSize;
+        }
+    }
+    
+    function createOrderParameterChart() {
+        const ctx = document.getElementById('orderParameterChart');
+        if (!ctx) return;
+        
+        orderParameterChart = new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Order Parameter R(t)',
+                    data: [],
+                    borderColor: '#4A5568',
+                    backgroundColor: 'rgba(74, 85, 104, 0.1)',
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: false,
+                scales: {
+                    x: { 
+                        title: { display: true, text: 'Time Steps' },
+                        ticks: { maxTicksLimit: 6 }
+                    },
+                    y: { 
+                        title: { display: true, text: 'R' },
+                        min: 0,
+                        max: 1
+                    }
+                },
+                plugins: { 
+                    legend: { display: false },
+                    tooltip: { enabled: false }
+                }
+            }
+        });
     }
 
     function initializeSimulation() {
@@ -430,6 +597,14 @@ document.addEventListener('DOMContentLoaded', () => {
         phases = Array.from({ length: N }, () => Math.random() * 2 * Math.PI);
         omegas = Array.from({ length: N }, () => (Math.random() - 0.5) * 2 * sigma_omega_sim);
         
+        // Reset order parameter history
+        orderParameterHistory = [];
+        if (orderParameterChart) {
+            orderParameterChart.data.labels = [];
+            orderParameterChart.data.datasets[0].data = [];
+            orderParameterChart.update();
+        }
+        
         animationFrameId = requestAnimationFrame(animate);
     }
     
@@ -446,6 +621,18 @@ document.addEventListener('DOMContentLoaded', () => {
         const order_R = Math.sqrt(sum_sin*sum_sin + sum_cos*sum_cos) / N;
         orderParamValue.textContent = order_R.toFixed(3);
         
+        // Update order parameter history (every 5 frames for performance)
+        if (Math.random() < 0.2) {
+            orderParameterHistory.push(order_R);
+            if (orderParameterHistory.length > 200) orderParameterHistory.shift();
+            
+            if (orderParameterChart && orderParameterHistory.length % 3 === 0) {
+                orderParameterChart.data.labels = Array.from({length: orderParameterHistory.length}, (_, i) => i);
+                orderParameterChart.data.datasets[0].data = orderParameterHistory;
+                orderParameterChart.update('none');
+            }
+        }
+        
         for (let i = 0; i < N; i++) {
             let coupling_sum = 0;
             for (let j = 0; j < N; j++) {
@@ -457,7 +644,57 @@ document.addEventListener('DOMContentLoaded', () => {
         phases = nextPhases;
         
         drawOscillators();
+        drawPhaseSpace();
         animationFrameId = requestAnimationFrame(animate);
+    }
+    
+    function drawPhaseSpace() {
+        if (!phaseCtx || N < 2) return;
+        
+        const width = phaseSpaceCanvas.width;
+        const height = phaseSpaceCanvas.height;
+        const padding = 20;
+        const plotWidth = width - 2 * padding;
+        const plotHeight = height - 2 * padding;
+        
+        phaseCtx.clearRect(0, 0, width, height);
+        
+        // Draw axes
+        phaseCtx.strokeStyle = '#E2E8F0';
+        phaseCtx.lineWidth = 1;
+        phaseCtx.beginPath();
+        phaseCtx.moveTo(padding, height - padding);
+        phaseCtx.lineTo(width - padding, height - padding);
+        phaseCtx.moveTo(padding, padding);
+        phaseCtx.lineTo(padding, height - padding);
+        phaseCtx.stroke();
+        
+        // Labels
+        phaseCtx.fillStyle = '#718096';
+        phaseCtx.font = '10px Inter';
+        phaseCtx.fillText('φ₁', width - padding + 5, height - padding + 5);
+        phaseCtx.fillText('φ₂', padding - 15, padding);
+        
+        // Plot first two oscillators in 2D phase space projection
+        for (let i = 0; i < Math.min(N, 50); i++) {
+            const x = padding + (phases[i] / (2 * Math.PI)) * plotWidth;
+            const y = height - padding - (phases[(i + 1) % N] / (2 * Math.PI)) * plotHeight;
+            
+            phaseCtx.beginPath();
+            phaseCtx.arc(x, y, 2, 0, 2 * Math.PI);
+            phaseCtx.fillStyle = `rgba(74, 85, 104, ${0.3 + 0.7 * (i / Math.min(N, 50))})`;
+            phaseCtx.fill();
+        }
+        
+        // Highlight synchronized state (all phases equal = diagonal line)
+        phaseCtx.strokeStyle = 'rgba(220, 38, 38, 0.3)';
+        phaseCtx.lineWidth = 2;
+        phaseCtx.setLineDash([5, 5]);
+        phaseCtx.beginPath();
+        phaseCtx.moveTo(padding, height - padding);
+        phaseCtx.lineTo(width - padding, padding);
+        phaseCtx.stroke();
+        phaseCtx.setLineDash([]);
     }
     
     function drawOscillators() {
@@ -488,8 +725,129 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => {
         resizeCanvas();
         drawOscillators();
+        drawPhaseSpace();
     });
 
+    // ====================
+    // MODULE: Data Export & Sharing
+    // ====================
+    function exportSimulationData() {
+        const data = {
+            parameters: {
+                N: N,
+                K: K,
+                sigma_omega: sigma_omega_sim,
+                K_c: parseFloat(criticalCouplingValue.textContent)
+            },
+            currentState: {
+                phases: phases,
+                omegas: omegas,
+                orderParameter: parseFloat(orderParamValue.textContent)
+            },
+            history: {
+                orderParameterHistory: orderParameterHistory
+            }
+        };
+        
+        // Convert to CSV format
+        let csv = 'Time Step,Order Parameter\n';
+        orderParameterHistory.forEach((r, i) => {
+            csv += `${i},${r}\n`;
+        });
+        csv += '\nParameters\n';
+        csv += `N,${N}\nK,${K}\nσ_ω,${sigma_omega_sim}\nK_c,${data.parameters.K_c}\n`;
+        csv += '\nCurrent Phase Values\n';
+        phases.forEach((p, i) => {
+            csv += `Oscillator ${i},${p},${omegas[i]}\n`;
+        });
+        
+        // Download
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `kakeya_simulation_N${N}_K${K.toFixed(2)}.csv`;
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+    
+    function shareConfiguration() {
+        const params = new URLSearchParams({
+            n: N,
+            k: K,
+            sigma: sigma_omega_sim
+        });
+        const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+        
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(url).then(() => {
+                const originalText = shareButton.textContent;
+                shareButton.textContent = '✓ Copied to Clipboard!';
+                setTimeout(() => {
+                    shareButton.textContent = originalText;
+                }, 2000);
+            });
+        } else {
+            alert(`Share this URL:\n${url}`);
+        }
+    }
+    
+    // ====================
+    // MODULE: Scenario Presets
+    // ====================
+    const presets = {
+        'ideal': { n: 10, k: 0.05, sigma: 0.021, description: 'Ideal KaiABC with Q10=1.0' },
+        'realistic': { n: 20, k: 0.1, sigma: 0.021, description: 'Realistic KaiABC deployment' },
+        'uncompensated': { n: 10, k: 0.4, sigma: 0.168, description: 'Poor temperature compensation' },
+        'large-network': { n: 100, k: 0.15, sigma: 0.05, description: 'Scaled IoT network' },
+        'weak-coupling': { n: 30, k: 0.02, sigma: 0.05, description: 'Minimal communication scenario' },
+        'strong-heterogeneity': { n: 20, k: 0.5, sigma: 1.0, description: 'Challenging conditions' }
+    };
+    
+    function loadPreset(presetName) {
+        if (!presetName || !presets[presetName]) return;
+        
+        const preset = presets[presetName];
+        nSlider.value = preset.n;
+        kSlider.value = preset.k;
+        omegaSlider.value = preset.sigma;
+        
+        nValue.textContent = preset.n;
+        kValue.textContent = preset.k.toFixed(2);
+        omegaValue.textContent = preset.sigma.toFixed(2);
+        
+        initializeSimulation();
+    }
+    
+    // Load parameters from URL if present
+    function loadFromURL() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.has('n')) {
+            const n = parseInt(params.get('n'));
+            if (n >= 5 && n <= 200) {
+                nSlider.value = n;
+                nValue.textContent = n;
+            }
+        }
+        if (params.has('k')) {
+            const k = parseFloat(params.get('k'));
+            if (k >= 0 && k <= 5) {
+                kSlider.value = k;
+                kValue.textContent = k.toFixed(2);
+            }
+        }
+        if (params.has('sigma')) {
+            const sigma = parseFloat(params.get('sigma'));
+            if (sigma >= 0 && sigma <= 2) {
+                omegaSlider.value = sigma;
+                omegaValue.textContent = sigma.toFixed(2);
+            }
+        }
+    }
+
+    // ====================
+    // EVENT LISTENERS & INITIALIZATION
+    // ====================
     nSlider.addEventListener('input', () => { nValue.textContent = nSlider.value; initializeSimulation(); });
     kSlider.addEventListener('input', () => { K = parseFloat(kSlider.value); kValue.textContent = K.toFixed(2); });
     omegaSlider.addEventListener('input', () => {
@@ -500,23 +858,29 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeSimulation();
     });
     resetButton.addEventListener('click', initializeSimulation);
+    exportButton.addEventListener('click', exportSimulationData);
+    shareButton.addEventListener('click', shareConfiguration);
+    presetSelector.addEventListener('change', (e) => loadPreset(e.target.value));
 
+    // Initialize all components
+    loadFromURL();
+    createOrderParameterChart();
     resizeCanvas();
     initializeSimulation();
 });
 </script>
 
-<footer class="bg-gray-100 border-t border-gray-200 mt-12 py-6">
-    <div class="max-w-6xl mx-auto px-6">
-        <div class="text-center text-gray-600">
-            <p class="mb-2">For detailed research methodology and mathematical foundations:</p>
-            <a href="../research/Geometric Constraints on Phase Space Exploration for Distributed Biological Oscillators.md" 
-               class="text-blue-600 hover:text-blue-800 underline font-medium">
-                Geometric Constraints on Phase Space Exploration for Distributed Biological Oscillators
-            </a>
+<footer class="md:ml-64 bg-gray-100 border-t border-gray-200 py-6">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="text-center text-gray-600">
+                <p class="mb-2">For detailed research methodology and mathematical foundations:</p>
+                <a href="../research/Geometric Constraints on Phase Space Exploration for Distributed Biological Oscillators.md" 
+                   class="text-blue-600 hover:text-blue-800 underline font-medium">
+                    Geometric Constraints on Phase Space Exploration for Distributed Biological Oscillators
+                </a>
+            </div>
         </div>
-    </div>
-</footer>
+    </footer>
 
 </body>
 </html>
