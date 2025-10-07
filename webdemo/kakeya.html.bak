@@ -188,19 +188,11 @@
                             <div class="relative h-8 bg-gray-200 rounded-full overflow-hidden mb-2">
                                 <div id="basin-volume-bar" class="h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-500" style="width: 28%"></div>
                             </div>
-                            <div class="flex justify-between items-center mb-2">
-                                <span id="basin-volume-value" class="text-2xl font-bold text-gray-900" title="Analytical estimate">28%</span>
+                            <div class="flex justify-between items-center">
+                                <span id="basin-volume-value" class="text-2xl font-bold text-gray-900">28%</span>
                                 <span id="basin-volume-status" class="text-sm font-medium text-green-700">Good Coverage</span>
                             </div>
-                            <div class="flex items-center justify-between">
-                                <p class="text-xs text-gray-500">Analytical estimate from geometric constraints</p>
-                                <button id="validate-basin-btn" class="text-xs px-3 py-1 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded transition-colors" title="Run Monte Carlo simulation to validate estimate">
-                                    Validate
-                                </button>
-                            </div>
-                            <div id="basin-mc-result" class="text-xs text-blue-700 mt-2 hidden">
-                                <span class="font-medium">Monte Carlo:</span> <span id="basin-mc-value">--</span>
-                            </div>
+                            <p class="text-xs text-gray-500 mt-2">Higher is better - indicates ease of achieving synchronization</p>
                         </div>
                         
                         <div class="param-card">
@@ -610,18 +602,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const temps = Array.from({ length: 21 }, (_, i) => 20 + i);
         const periods = temps.map(t => T_ref * Math.pow(q10, (temp_ref - t) / 10));
         
-        // Use Monte Carlo sampling for more accurate σ_ω calculation
-        // Falls back to linear approximation for small temperature variations
-        let sigma_omega;
-        if (sigma_T < 2.0) {
-            // Linear approximation is sufficient for small variations
-            const dT_dTemp_at_ref = -T_ref * (Math.log(q10) / 10);
-            const d_omega_dT = - (2 * Math.PI / (T_ref * T_ref)) * dT_dTemp_at_ref;
-            sigma_omega = Math.abs(d_omega_dT * sigma_T);
-        } else {
-            // Monte Carlo sampling for larger temperature ranges (more accurate)
-            sigma_omega = computeOmegaVarianceMonteCarlo(q10, sigma_T, T_ref, temp_ref, 1000);
-        }
+        const dT_dTemp_at_ref = -T_ref * (Math.log(q10) / 10);
+        const d_omega_dT = - (2 * Math.PI / (T_ref * T_ref)) * dT_dTemp_at_ref;
+        const sigma_omega = Math.abs(d_omega_dT * sigma_T);
         
         // Calculate heterogeneity percentage
         const heterogeneity_percent = (sigma_omega / omega_mean) * 100;
@@ -661,26 +644,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const basin_fraction = Math.pow(Math.max(0.01, 1 - alpha * sigma_omega / omega_mean), N);
         const basin_percent = basin_fraction * 100;
         
-        // Optional: Monte Carlo validation (commented out for performance, can be enabled for research)
-        // Uncomment the following lines to validate basin volume predictions with actual simulations
-        /*
-        if (Math.random() < 0.05) { // Validate 5% of the time
-            const K_test = Math.max(2 * sigma_omega, 0.1);
-            const mc_fraction = validateBasinVolumeMonteCarlo(N, K_test, sigma_omega, 50);
-            console.log(`Basin Volume - Analytical: ${(basin_percent).toFixed(2)}%, Monte Carlo: ${(mc_fraction * 100).toFixed(2)}%`);
-        }
-        */
-        
         const basinBar = document.getElementById('basin-volume-bar');
         const basinValue = document.getElementById('basin-volume-value');
         const basinStatus = document.getElementById('basin-volume-status');
         
         if (basinBar) basinBar.style.width = `${Math.max(1, Math.min(100, basin_percent))}%`;
-        if (basinValue) {
-            // Display both analytical and option to show validated value
-            basinValue.textContent = basin_percent >= 1 ? `${basin_percent.toFixed(0)}%` : `${basin_percent.toFixed(2)}%`;
-            basinValue.title = 'Analytical estimate based on geometric constraints';
-        }
+        if (basinValue) basinValue.textContent = basin_percent >= 1 ? `${basin_percent.toFixed(0)}%` : `${basin_percent.toFixed(2)}%`;
         
         if (basinStatus) {
             if (basin_percent > 50) {
@@ -862,107 +831,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ====================
-    // HELPER FUNCTIONS FOR IMPROVED ACCURACY
-    // ====================
-    
-    /**
-     * Calculate standard deviation of an array
-     */
-    function standardDeviation(values) {
-        const n = values.length;
-        if (n === 0) return 0;
-        const mean = values.reduce((a, b) => a + b, 0) / n;
-        const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / n;
-        return Math.sqrt(variance);
-    }
-    
-    /**
-     * Compute Kuramoto model derivatives for RK4 integration
-     * @param {Array} phases - Current phase values
-     * @param {Array} omegas - Natural frequency values
-     * @param {number} K - Coupling strength
-     * @param {number} N - Number of oscillators
-     * @returns {Array} - Derivatives dφ/dt for each oscillator
-     */
-    function kuramotoDerivative(phases, omegas, K, N) {
-        const dphases = new Array(N);
-        for (let i = 0; i < N; i++) {
-            let coupling = 0;
-            for (let j = 0; j < N; j++) {
-                coupling += Math.sin(phases[j] - phases[i]);
-            }
-            dphases[i] = omegas[i] + (K / N) * coupling;
-        }
-        return dphases;
-    }
-    
-    /**
-     * Monte Carlo sampling for temperature-to-frequency conversion
-     * More accurate than linear approximation for large temperature ranges
-     */
-    function computeOmegaVarianceMonteCarlo(q10, sigma_T, T_ref, temp_mean, samples = 1000) {
-        const omegas = [];
-        for (let i = 0; i < samples; i++) {
-            // Sample from normal distribution (~99% within ±2.5σ)
-            const T = temp_mean + (Math.random() - 0.5) * 2 * sigma_T * 2.5;
-            const period = T_ref * Math.pow(q10, (T_ref - T) / 10);
-            omegas.push(2 * Math.PI / period);
-        }
-        return standardDeviation(omegas);
-    }
-    
-    /**
-     * Monte Carlo validation of basin of attraction volume
-     * Tests whether random initial conditions lead to synchronization
-     */
-    function validateBasinVolumeMonteCarlo(N_test, K_test, sigma_omega_test, trials = 100) {
-        let successful_syncs = 0;
-        const convergence_threshold = 0.8; // R > 0.8 considered synchronized
-        const max_iterations = 500;
-        const dt = 0.01;
-        
-        for (let trial = 0; trial < trials; trial++) {
-            // Random initial conditions
-            let test_phases = Array.from({ length: N_test }, () => Math.random() * 2 * Math.PI);
-            const test_omegas = Array.from({ length: N_test }, () => (Math.random() - 0.5) * 2 * sigma_omega_test);
-            
-            // Simulate for fixed time
-            for (let iter = 0; iter < max_iterations; iter++) {
-                // RK4 integration
-                const k1 = kuramotoDerivative(test_phases, test_omegas, K_test, N_test);
-                
-                const phases_k2 = test_phases.map((p, i) => p + 0.5 * dt * k1[i]);
-                const k2 = kuramotoDerivative(phases_k2, test_omegas, K_test, N_test);
-                
-                const phases_k3 = test_phases.map((p, i) => p + 0.5 * dt * k2[i]);
-                const k3 = kuramotoDerivative(phases_k3, test_omegas, K_test, N_test);
-                
-                const phases_k4 = test_phases.map((p, i) => p + dt * k3[i]);
-                const k4 = kuramotoDerivative(phases_k4, test_omegas, K_test, N_test);
-                
-                // Update phases
-                test_phases = test_phases.map((p, i) => 
-                    (p + (dt / 6) * (k1[i] + 2*k2[i] + 2*k3[i] + k4[i])) % (2 * Math.PI)
-                );
-            }
-            
-            // Check if synchronized
-            let sum_sin = 0, sum_cos = 0;
-            for (let i = 0; i < N_test; i++) {
-                sum_sin += Math.sin(test_phases[i]);
-                sum_cos += Math.cos(test_phases[i]);
-            }
-            const order_R = Math.sqrt(sum_sin*sum_sin + sum_cos*sum_cos) / N_test;
-            
-            if (order_R > convergence_threshold) {
-                successful_syncs++;
-            }
-        }
-        
-        return successful_syncs / trials;
-    }
-
     function initializeSimulation() {
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
 
@@ -993,6 +861,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function animate() {
         const dt = 0.01;
+        const nextPhases = new Array(N);
 
         let sum_sin = 0, sum_cos = 0;
         for(let i=0; i<N; ++i) {
@@ -1015,22 +884,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // RK4 Integration (4th order Runge-Kutta) - more accurate than Euler method
-        const k1 = kuramotoDerivative(phases, omegas, K, N);
-        
-        const phases_k2 = phases.map((p, i) => p + 0.5 * dt * k1[i]);
-        const k2 = kuramotoDerivative(phases_k2, omegas, K, N);
-        
-        const phases_k3 = phases.map((p, i) => p + 0.5 * dt * k2[i]);
-        const k3 = kuramotoDerivative(phases_k3, omegas, K, N);
-        
-        const phases_k4 = phases.map((p, i) => p + dt * k3[i]);
-        const k4 = kuramotoDerivative(phases_k4, omegas, K, N);
-        
-        // Update phases with weighted average of slopes
-        phases = phases.map((p, i) => 
-            (p + (dt / 6) * (k1[i] + 2*k2[i] + 2*k3[i] + k4[i])) % (2 * Math.PI)
-        );
+        for (let i = 0; i < N; i++) {
+            let coupling_sum = 0;
+            for (let j = 0; j < N; j++) {
+                coupling_sum += Math.sin(phases[j] - phases[i]);
+            }
+            const d_theta = (omegas[i] + (K / N) * coupling_sum) * dt;
+            nextPhases[i] = (phases[i] + d_theta) % (2 * Math.PI);
+        }
+        phases = nextPhases;
         
         drawOscillators();
         drawPhaseSpace();
@@ -1250,64 +1112,6 @@ document.addEventListener('DOMContentLoaded', () => {
     exportButton.addEventListener('click', exportSimulationData);
     shareButton.addEventListener('click', shareConfiguration);
     presetSelector.addEventListener('change', (e) => loadPreset(e.target.value));
-    
-    // Environmental parameter sliders
-    q10Slider.addEventListener('input', updateEnvironmentCalculations);
-    tempVarianceSlider.addEventListener('input', updateEnvironmentCalculations);
-    
-    // Basin volume Monte Carlo validation
-    const validateBasinBtn = document.getElementById('validate-basin-btn');
-    if (validateBasinBtn) {
-        validateBasinBtn.addEventListener('click', function() {
-            const btn = this;
-            const originalText = btn.textContent;
-            btn.textContent = 'Validating...';
-            btn.disabled = true;
-            
-            // Run validation in a setTimeout to allow UI to update
-            setTimeout(() => {
-                const q10 = parseFloat(q10Slider.value);
-                const sigma_T = parseFloat(tempVarianceSlider.value);
-                const T_ref = 24;
-                const temp_ref = 30;
-                const omega_mean = 2 * Math.PI / T_ref;
-                
-                // Calculate sigma_omega (reuse logic from updateEnvironmentCalculations)
-                let sigma_omega;
-                if (sigma_T < 2.0) {
-                    const dT_dTemp_at_ref = -T_ref * (Math.log(q10) / 10);
-                    const d_omega_dT = - (2 * Math.PI / (T_ref * T_ref)) * dT_dTemp_at_ref;
-                    sigma_omega = Math.abs(d_omega_dT * sigma_T);
-                } else {
-                    sigma_omega = computeOmegaVarianceMonteCarlo(q10, sigma_T, T_ref, temp_ref, 1000);
-                }
-                
-                const N_test = 10;
-                const K_test = Math.max(2 * sigma_omega, 0.1);
-                
-                // Run Monte Carlo validation (50 trials for reasonable speed)
-                const mc_fraction = validateBasinVolumeMonteCarlo(N_test, K_test, sigma_omega, 50);
-                const mc_percent = mc_fraction * 100;
-                
-                // Display results
-                const mcResult = document.getElementById('basin-mc-result');
-                const mcValue = document.getElementById('basin-mc-value');
-                if (mcResult && mcValue) {
-                    mcValue.textContent = mc_percent >= 1 ? `${mc_percent.toFixed(0)}%` : `${mc_percent.toFixed(2)}%`;
-                    mcResult.classList.remove('hidden');
-                }
-                
-                btn.textContent = originalText;
-                btn.disabled = false;
-                
-                console.log(`Basin Volume Validation - Analytical vs Monte Carlo:`, {
-                    analytical: document.getElementById('basin-volume-value').textContent,
-                    monte_carlo: `${mc_percent.toFixed(2)}%`,
-                    parameters: { N: N_test, K: K_test.toFixed(3), sigma_omega: sigma_omega.toFixed(4) }
-                });
-            }, 50);
-        });
-    }
 
     // Initialize all components
     loadFromURL();
