@@ -176,18 +176,52 @@
                 <div class="grid md:grid-cols-2 gap-6 mb-6">
                     <div>
                         <h4 class="font-semibold text-gray-900 mb-2">Current Calculation (MQTT/WiFi)</h4>
-                        <div class="code-block">
-Energy per message: 50 mJ (WiFi/MQTT stack)<br>
-Updates per day: 6 (rapid sync) or 2 (steady state)<br>
-Daily energy: 0.3 J/day → 246-year battery life @ 3000 mAh
+                        <div class="bg-orange-50 border-2 border-orange-300 rounded-lg p-4">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="text-2xl">⚡</div>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-semibold text-gray-800">Energy per message</div>
+                                        <div class="text-lg font-bold text-orange-700">50 mJ</div>
+                                        <div class="text-xs text-gray-600">(WiFi/MQTT stack)</div>
+                                    </div>
+                                </div>
+                                <div class="border-t border-orange-200 pt-2">
+                                    <div class="text-sm text-gray-700">
+                                        <div>Updates: 6/day (rapid) or 2/day (steady)</div>
+                                        <div>Daily energy: <strong>0.3 J/day</strong></div>
+                                    </div>
+                                </div>
+                                <div class="bg-orange-100 rounded p-2 text-center">
+                                    <div class="text-xs text-gray-600">Battery Life @ 3000 mAh</div>
+                                    <div class="text-xl font-bold text-orange-900">246 years</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div>
                         <h4 class="font-semibold text-gray-900 mb-2">With LoRaWAN (SF10, 14 dBm)</h4>
-                        <div class="code-block">
-Energy per transmission: 12 mJ (measured from SX1276)<br>
-Updates per day: 6 (rapid sync) or 2 (steady state)<br>
-Daily energy: 0.072 J/day → 1,027-YEAR battery life @ 3000 mAh
+                        <div class="bg-green-50 border-2 border-green-400 rounded-lg p-4">
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="text-2xl">⚡</div>
+                                    <div class="flex-1">
+                                        <div class="text-sm font-semibold text-gray-800">Energy per transmission</div>
+                                        <div class="text-lg font-bold text-green-700">12 mJ ✓</div>
+                                        <div class="text-xs text-gray-600">(Measured from SX1276)</div>
+                                    </div>
+                                </div>
+                                <div class="border-t border-green-200 pt-2">
+                                    <div class="text-sm text-gray-700">
+                                        <div>Updates: 6/day (rapid) or 2/day (steady)</div>
+                                        <div>Daily energy: <strong>0.072 J/day</strong></div>
+                                    </div>
+                                </div>
+                                <div class="bg-green-200 rounded p-2 text-center">
+                                    <div class="text-xs text-gray-600">Battery Life @ 3000 mAh</div>
+                                    <div class="text-2xl font-bold text-green-900">1,027 years! 🎉</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -245,54 +279,195 @@ Daily energy: 0.072 J/day → 1,027-YEAR battery life @ 3000 mAh
                 <div class="metric-card">
                     <h3 class="text-lg font-semibold text-[#8a7962] mb-4">Architecture: LoRaWAN Class A</h3>
                     <p class="text-gray-700 mb-4">Class A (Uplink-focused) prioritizes battery life with minimal downlink requirements.</p>
-                    <div class="bg-gray-100 p-4 rounded text-sm font-mono">
-┌─────────────────────────────────────────────────────────────┐<br>
-│  KaiABC Node (End Device)                                   │<br>
-│  ┌────────────────┐    ┌──────────────┐    ┌─────────────┐ │<br>
-│  │ BME280 Sensor  │───▶│ KaiABC Core  │───▶│ SX1276/8/9  │─┼──┐<br>
-│  │ (Temperature)  │    │ Oscillator   │    │ LoRa Radio  │ │  │<br>
-│  └────────────────┘    └──────────────┘    └─────────────┘ │  │<br>
-│         ↑                      ↓                    ↑       │  │<br>
-│   Entrainment              Phase φ(t)          Sync Message│  │<br>
-└─────────────────────────────────────────────────────────────┘  │<br>
-                                                                  │<br>
-                            LoRaWAN PHY                          │<br>
-                         (0.3-50 kbps, ISM bands)                │<br>
-                                                                  │<br>
-┌─────────────────────────────────────────────────────────────┐  │<br>
-│  LoRaWAN Gateway (8-channel)                                │◀─┘<br>
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐  │<br>
-│  │ SX1301/2     │───▶│ Packet       │───▶│ Backhaul     │──┼──┐<br>
-│  │ Concentrator │    │ Forwarder    │    │ (Ethernet/4G)│  │  │<br>
-│  └──────────────┘    └──────────────┘    └──────────────┘  │  │<br>
-└─────────────────────────────────────────────────────────────┘  │<br>
-                                                                  │<br>
-                            Internet                              │<br>
-                                                                  │<br>
-┌─────────────────────────────────────────────────────────────┐  │<br>
-│  Network Server (Chirpstack, TTN, AWS IoT Core)            │◀─┘<br>
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐  │<br>
-│  │ Deduplication│───▶│ Kuramoto     │───▶│ Application  │  │<br>
-│  │ & Routing    │    │ Sync Engine  │    │ Callbacks    │  │<br>
-│  └──────────────┘    └──────────────┘    └──────────────┘  │<br>
-└─────────────────────────────────────────────────────────────┘
+                    
+                    <!-- Improved Architecture Diagram -->
+                    <div class="bg-gradient-to-br from-gray-50 to-gray-100 p-6 rounded-lg">
+                        <!-- Node Layer -->
+                        <div class="bg-blue-50 border-2 border-blue-400 rounded-lg p-4 mb-6">
+                            <h4 class="font-semibold text-blue-900 mb-3">KaiABC Node (End Device)</h4>
+                            <div class="flex flex-wrap items-center justify-around gap-4">
+                                <div class="bg-white border-2 border-blue-300 rounded px-4 py-3 text-center min-w-[120px]">
+                                    <div class="text-2xl mb-1">🌡️</div>
+                                    <div class="text-xs font-semibold text-gray-800">BME280 Sensor</div>
+                                    <div class="text-xs text-gray-600">(Temperature)</div>
+                                </div>
+                                <div class="text-2xl text-blue-600">→</div>
+                                <div class="bg-white border-2 border-blue-300 rounded px-4 py-3 text-center min-w-[120px]">
+                                    <div class="text-2xl mb-1">⚙️</div>
+                                    <div class="text-xs font-semibold text-gray-800">KaiABC Core</div>
+                                    <div class="text-xs text-gray-600">Oscillator</div>
+                                </div>
+                                <div class="text-2xl text-blue-600">→</div>
+                                <div class="bg-white border-2 border-blue-300 rounded px-4 py-3 text-center min-w-[120px]">
+                                    <div class="text-2xl mb-1">📡</div>
+                                    <div class="text-xs font-semibold text-gray-800">SX1276/8/9</div>
+                                    <div class="text-xs text-gray-600">LoRa Radio</div>
+                                </div>
+                            </div>
+                            <div class="mt-3 flex justify-between text-xs text-blue-700">
+                                <div class="text-center">↑ Entrainment</div>
+                                <div class="text-center">↓ Phase φ(t)</div>
+                                <div class="text-center">↑ Sync Message</div>
+                            </div>
+                        </div>
+
+                        <!-- Physical Layer -->
+                        <div class="text-center py-4">
+                            <div class="inline-block bg-gradient-to-r from-purple-100 to-purple-200 border-2 border-purple-400 rounded-full px-6 py-2">
+                                <div class="text-sm font-semibold text-purple-900">LoRaWAN PHY</div>
+                                <div class="text-xs text-purple-700">(0.3-50 kbps, ISM bands)</div>
+                            </div>
+                            <div class="text-3xl text-purple-600 my-2">↓</div>
+                        </div>
+
+                        <!-- Gateway Layer -->
+                        <div class="bg-green-50 border-2 border-green-400 rounded-lg p-4 mb-6">
+                            <h4 class="font-semibold text-green-900 mb-3">LoRaWAN Gateway (8-channel)</h4>
+                            <div class="flex flex-wrap items-center justify-around gap-4">
+                                <div class="bg-white border-2 border-green-300 rounded px-4 py-3 text-center min-w-[120px]">
+                                    <div class="text-2xl mb-1">📻</div>
+                                    <div class="text-xs font-semibold text-gray-800">SX1301/2</div>
+                                    <div class="text-xs text-gray-600">Concentrator</div>
+                                </div>
+                                <div class="text-2xl text-green-600">→</div>
+                                <div class="bg-white border-2 border-green-300 rounded px-4 py-3 text-center min-w-[120px]">
+                                    <div class="text-2xl mb-1">📦</div>
+                                    <div class="text-xs font-semibold text-gray-800">Packet</div>
+                                    <div class="text-xs text-gray-600">Forwarder</div>
+                                </div>
+                                <div class="text-2xl text-green-600">→</div>
+                                <div class="bg-white border-2 border-green-300 rounded px-4 py-3 text-center min-w-[120px]">
+                                    <div class="text-2xl mb-1">🌐</div>
+                                    <div class="text-xs font-semibold text-gray-800">Backhaul</div>
+                                    <div class="text-xs text-gray-600">(Ethernet/4G)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Internet Layer -->
+                        <div class="text-center py-4">
+                            <div class="inline-block bg-gradient-to-r from-gray-100 to-gray-200 border-2 border-gray-400 rounded-full px-6 py-2">
+                                <div class="text-sm font-semibold text-gray-900">Internet</div>
+                            </div>
+                            <div class="text-3xl text-gray-600 my-2">↓</div>
+                        </div>
+
+                        <!-- Network Server Layer -->
+                        <div class="bg-orange-50 border-2 border-orange-400 rounded-lg p-4">
+                            <h4 class="font-semibold text-orange-900 mb-3">Network Server (Chirpstack, TTN, AWS IoT Core)</h4>
+                            <div class="flex flex-wrap items-center justify-around gap-4">
+                                <div class="bg-white border-2 border-orange-300 rounded px-4 py-3 text-center min-w-[120px]">
+                                    <div class="text-2xl mb-1">🔀</div>
+                                    <div class="text-xs font-semibold text-gray-800">Deduplication</div>
+                                    <div class="text-xs text-gray-600">& Routing</div>
+                                </div>
+                                <div class="text-2xl text-orange-600">→</div>
+                                <div class="bg-white border-2 border-orange-300 rounded px-4 py-3 text-center min-w-[120px]">
+                                    <div class="text-2xl mb-1">🔄</div>
+                                    <div class="text-xs font-semibold text-gray-800">Kuramoto</div>
+                                    <div class="text-xs text-gray-600">Sync Engine</div>
+                                </div>
+                                <div class="text-2xl text-orange-600">→</div>
+                                <div class="bg-white border-2 border-orange-300 rounded px-4 py-3 text-center min-w-[120px]">
+                                    <div class="text-2xl mb-1">📱</div>
+                                    <div class="text-xs font-semibold text-gray-800">Application</div>
+                                    <div class="text-xs text-gray-600">Callbacks</div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="metric-card">
                     <h3 class="text-lg font-semibold text-[#8a7962] mb-4">Message Format (10 bytes)</h3>
-                    <div class="code-block mb-4">
-typedef struct {<br>
-    uint16_t node_id;        // 2 bytes: Unique oscillator ID (1-65535)<br>
-    uint16_t phase;          // 2 bytes: Current phase φ in units of 2π/65536<br>
-    uint16_t period;         // 2 bytes: Current period in 0.1 hour units<br>
-    uint8_t  temperature;    // 1 byte: Local temperature (°C + 50)<br>
-    uint8_t  order_param;    // 1 byte: Local order parameter R × 255<br>
-    uint8_t  battery_level;  // 1 byte: Battery percentage<br>
-    uint8_t  sequence;       // 1 byte: Message sequence number (rollover)<br>
-} __attribute__((packed)) kai_sync_message_t;
+                    
+                    <!-- Improved Message Format Diagram -->
+                    <div class="bg-gradient-to-br from-indigo-50 to-purple-50 border-2 border-indigo-300 rounded-lg p-4 mb-4">
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-3 p-2 bg-white rounded border-l-4 border-blue-500">
+                                <div class="font-mono text-xs text-gray-500 w-16">2 bytes</div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">node_id</div>
+                                    <div class="text-xs text-gray-600">Unique oscillator ID (1-65535)</div>
+                                </div>
+                                <div class="text-blue-600">🔢</div>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 p-2 bg-white rounded border-l-4 border-green-500">
+                                <div class="font-mono text-xs text-gray-500 w-16">2 bytes</div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">phase</div>
+                                    <div class="text-xs text-gray-600">Current phase φ in units of 2π/65536</div>
+                                </div>
+                                <div class="text-green-600">🔄</div>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 p-2 bg-white rounded border-l-4 border-purple-500">
+                                <div class="font-mono text-xs text-gray-500 w-16">2 bytes</div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">period</div>
+                                    <div class="text-xs text-gray-600">Current period in 0.1 hour units</div>
+                                </div>
+                                <div class="text-purple-600">⏱️</div>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 p-2 bg-white rounded border-l-4 border-orange-500">
+                                <div class="font-mono text-xs text-gray-500 w-16">1 byte</div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">temperature</div>
+                                    <div class="text-xs text-gray-600">Local temperature (°C + 50)</div>
+                                </div>
+                                <div class="text-orange-600">🌡️</div>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 p-2 bg-white rounded border-l-4 border-teal-500">
+                                <div class="font-mono text-xs text-gray-500 w-16">1 byte</div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">order_param</div>
+                                    <div class="text-xs text-gray-600">Local order parameter R × 255</div>
+                                </div>
+                                <div class="text-teal-600">📊</div>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 p-2 bg-white rounded border-l-4 border-red-500">
+                                <div class="font-mono text-xs text-gray-500 w-16">1 byte</div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">battery_level</div>
+                                    <div class="text-xs text-gray-600">Battery percentage (0-100%)</div>
+                                </div>
+                                <div class="text-red-600">🔋</div>
+                            </div>
+                            
+                            <div class="flex items-center gap-3 p-2 bg-white rounded border-l-4 border-gray-500">
+                                <div class="font-mono text-xs text-gray-500 w-16">1 byte</div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-sm">sequence</div>
+                                    <div class="text-xs text-gray-600">Message sequence number (rollover)</div>
+                                </div>
+                                <div class="text-gray-600">#️⃣</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4 pt-4 border-t-2 border-indigo-200">
+                            <div class="bg-gradient-to-r from-indigo-100 to-purple-100 rounded p-3 text-center">
+                                <div class="text-sm text-gray-700 mb-1">Total Payload Size</div>
+                                <div class="text-2xl font-bold text-indigo-900">10 bytes</div>
+                                <div class="text-xs text-gray-600 mt-1">Well within LoRaWAN 51-byte minimum ✓</div>
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-sm text-gray-600"><strong>Total Size:</strong> 10 bytes (well within LoRaWAN 51-byte minimum)</p>
+                    
+                    <div class="bg-gray-50 border border-gray-300 rounded p-3">
+                        <div class="text-xs font-mono text-gray-700">
+                            <div class="font-semibold mb-2">C struct definition:</div>
+                            <div class="bg-white p-2 rounded border border-gray-200">
+typedef struct {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;uint16_t node_id, phase, period;<br>
+&nbsp;&nbsp;&nbsp;&nbsp;uint8_t temperature, order_param, battery_level, sequence;<br>
+} __attribute__((packed)) kai_sync_message_t;
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -479,50 +654,171 @@ Node3 ←→ Node4
                 <div class="metric-card">
                     <h3 class="text-lg font-semibold text-[#8a7962] mb-4">End Device (Node)</h3>
                     <h4 class="font-semibold text-gray-900 mb-2">Recommended Stack</h4>
-                    <div class="code-block mb-4">
-MCU:        STM32WL (integrated LoRa)  $3-5<br>
-            OR<br>
-            ESP32-C3 + RFM95W          $5-8<br>
-<br>
-Sensor:     BME280 (I²C)               $8<br>
-Battery:    18650 Li-Ion 3000 mAh      $5<br>
-Enclosure:  IP67 waterproof            $3<br>
-<br>
-Total:      $19-29 per node
+                    
+                    <!-- Improved Hardware Stack Visualization -->
+                    <div class="bg-gradient-to-br from-blue-50 to-purple-50 p-4 rounded-lg mb-4">
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <!-- Option 1 -->
+                            <div class="bg-white border-2 border-blue-400 rounded-lg p-4">
+                                <div class="font-semibold text-blue-900 mb-3 text-center">Option 1: Integrated</div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center p-2 bg-blue-50 rounded">
+                                        <span class="text-sm"><strong>MCU:</strong> STM32WL</span>
+                                        <span class="text-sm font-semibold text-blue-700">$3-5</span>
+                                    </div>
+                                    <div class="text-xs text-center text-blue-600 py-1">✓ Integrated LoRa</div>
+                                </div>
+                            </div>
+
+                            <!-- Option 2 -->
+                            <div class="bg-white border-2 border-purple-400 rounded-lg p-4">
+                                <div class="font-semibold text-purple-900 mb-3 text-center">Option 2: Modular</div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between items-center p-2 bg-purple-50 rounded">
+                                        <span class="text-sm"><strong>MCU:</strong> ESP32-C3</span>
+                                        <span class="text-sm font-semibold text-purple-700">$3-4</span>
+                                    </div>
+                                    <div class="flex justify-between items-center p-2 bg-purple-50 rounded">
+                                        <span class="text-sm"><strong>Radio:</strong> RFM95W</span>
+                                        <span class="text-sm font-semibold text-purple-700">$2-4</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Common Components -->
+                        <div class="bg-white border-2 border-gray-300 rounded-lg p-4">
+                            <div class="font-semibold text-gray-900 mb-3 text-center">Common Components</div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                    <span class="text-sm">🌡️ <strong>Sensor:</strong> BME280 (I²C)</span>
+                                    <span class="text-sm font-semibold text-gray-700">$8</span>
+                                </div>
+                                <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                    <span class="text-sm">🔋 <strong>Battery:</strong> 18650 Li-Ion 3000 mAh</span>
+                                    <span class="text-sm font-semibold text-gray-700">$5</span>
+                                </div>
+                                <div class="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                    <span class="text-sm">📦 <strong>Enclosure:</strong> IP67 waterproof</span>
+                                    <span class="text-sm font-semibold text-gray-700">$3</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Total Cost -->
+                        <div class="mt-4 bg-gradient-to-r from-green-100 to-green-200 border-2 border-green-500 rounded-lg p-3 text-center">
+                            <div class="text-lg font-bold text-green-900">Total: $19-29 per node</div>
+                        </div>
                     </div>
 
                     <h4 class="font-semibold text-gray-900 mb-2">Key Features</h4>
-                    <ul class="text-gray-700 text-sm space-y-1">
-                        <li><strong>STM32WL:</strong> Ultra-low power (1.5 µA sleep), integrated LoRa, ideal for 1000+ year deployments</li>
-                        <li><strong>ESP32-C3:</strong> More processing power, WiFi fallback, easier development</li>
-                        <li>Both support real-time clock (RTC) for oscillator state</li>
-                    </ul>
+                    <div class="grid md:grid-cols-2 gap-3">
+                        <div class="bg-blue-50 border-l-4 border-blue-500 p-3 rounded">
+                            <div class="font-semibold text-blue-900 text-sm mb-1">STM32WL</div>
+                            <div class="text-xs text-blue-700">Ultra-low power (1.5 µA sleep), integrated LoRa, ideal for 1000+ year deployments</div>
+                        </div>
+                        <div class="bg-purple-50 border-l-4 border-purple-500 p-3 rounded">
+                            <div class="font-semibold text-purple-900 text-sm mb-1">ESP32-C3</div>
+                            <div class="text-xs text-purple-700">More processing power, WiFi fallback, easier development with Arduino/MicroPython</div>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-sm text-gray-600">
+                        ✓ Both support real-time clock (RTC) for oscillator state persistence
+                    </div>
                 </div>
 
                 <div class="metric-card">
                     <h3 class="text-lg font-semibold text-[#8a7962] mb-4">Gateway Options</h3>
 
-                    <div class="mb-6">
-                        <h4 class="font-semibold text-gray-900 mb-2">Option A: DIY (Low Cost)</h4>
-                        <div class="code-block">
-Raspberry Pi 4 + RAK2287 (SX1302)      $150-200<br>
-8-channel, handles 500+ nodes
+                    <div class="space-y-4">
+                        <!-- Option A -->
+                        <div class="bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-400 rounded-lg p-4">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h4 class="font-semibold text-green-900 text-lg">Option A: DIY (Low Cost)</h4>
+                                    <div class="text-xs text-green-700 mt-1">Best for: Prototyping, small deployments</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-green-900">$150-200</div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded p-3">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="text-3xl">🥧</div>
+                                    <div>
+                                        <div class="font-semibold text-sm">Raspberry Pi 4 + RAK2287 (SX1302)</div>
+                                        <div class="text-xs text-gray-600">8-channel concentrator, handles 500+ nodes</div>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2 mt-2">
+                                    <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Easy setup</span>
+                                    <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Open source</span>
+                                    <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">ChirpStack ready</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="mb-6">
-                        <h4 class="font-semibold text-gray-900 mb-2">Option B: Commercial (Robust)</h4>
-                        <div class="code-block">
-Kerlink Wirnet iStation                $500-800<br>
-Industrial-grade, outdoor rated
+                        <!-- Option B -->
+                        <div class="bg-gradient-to-r from-blue-50 to-blue-100 border-2 border-blue-400 rounded-lg p-4">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h4 class="font-semibold text-blue-900 text-lg">Option B: Commercial (Robust)</h4>
+                                    <div class="text-xs text-blue-700 mt-1">Best for: Production, outdoor deployments</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-blue-900">$500-800</div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded p-3">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <div class="text-3xl">🏭</div>
+                                    <div>
+                                        <div class="font-semibold text-sm">Kerlink Wirnet iStation</div>
+                                        <div class="text-xs text-gray-600">Industrial-grade, IP67 outdoor rated, -40°C to +70°C</div>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2 mt-2">
+                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">Weatherproof</span>
+                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">5-year warranty</span>
+                                    <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">LTE backup</span>
+                                </div>
+                            </div>
                         </div>
-                    </div>
 
-                    <div>
-                        <h4 class="font-semibold text-gray-900 mb-2">Option C: Cloud (No Hardware)</h4>
-                        <div class="code-block">
-The Things Network (Free tier)         $0<br>
-Helium Network (Decentralized)         ~$0.01/msg
+                        <!-- Option C -->
+                        <div class="bg-gradient-to-r from-purple-50 to-purple-100 border-2 border-purple-400 rounded-lg p-4">
+                            <div class="flex items-start justify-between mb-3">
+                                <div>
+                                    <h4 class="font-semibold text-purple-900 text-lg">Option C: Cloud (No Hardware)</h4>
+                                    <div class="text-xs text-purple-700 mt-1">Best for: Testing, urban areas with coverage</div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-purple-900">$0</div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded p-3 space-y-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="text-2xl">☁️</div>
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-sm">The Things Network (Free tier)</div>
+                                        <div class="text-xs text-gray-600">Community-operated gateways, free data transmission</div>
+                                    </div>
+                                    <div class="text-sm font-bold text-purple-700">FREE</div>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <div class="text-2xl">🎈</div>
+                                    <div class="flex-1">
+                                        <div class="font-semibold text-sm">Helium Network (Decentralized)</div>
+                                        <div class="text-xs text-gray-600">Blockchain-based, pay-per-message pricing</div>
+                                    </div>
+                                    <div class="text-sm font-bold text-purple-700">~$0.01/msg</div>
+                                </div>
+                                <div class="flex gap-2 mt-2">
+                                    <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Zero setup</span>
+                                    <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Instant deployment</span>
+                                    <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">Coverage-dependent</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -763,23 +1059,79 @@ Helium Network (Decentralized)         ~$0.01/msg
             <div class="grid md:grid-cols-2 gap-8 mb-8">
                 <div class="metric-card">
                     <h3 class="text-lg font-semibold text-[#8a7962] mb-4">Traditional Approach (WiFi + MQTT)</h3>
-                    <div class="code-block">
-Hardware:     ESP32 ($5) + BME280 ($8) + WiFi router ($50)<br>
-Power:        50 mJ/msg → 246-year battery (impractical, needs wall power)<br>
-Range:        50m (single room)<br>
-Infrastructure: WiFi access point required<br>
-Cost/node:    $13 + infrastructure
+                    
+                    <!-- WiFi Comparison Card -->
+                    <div class="bg-gradient-to-br from-orange-50 to-red-50 border-2 border-orange-400 rounded-lg p-4">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-2 bg-white rounded">
+                                <span class="text-sm font-semibold">💻 Hardware</span>
+                                <span class="text-sm">ESP32 + BME280</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-white rounded">
+                                <span class="text-sm font-semibold">⚡ Power</span>
+                                <span class="text-sm text-orange-700">50 mJ/msg</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-white rounded">
+                                <span class="text-sm font-semibold">🔋 Battery Life</span>
+                                <span class="text-sm text-orange-700">246 years*</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-white rounded">
+                                <span class="text-sm font-semibold">📡 Range</span>
+                                <span class="text-sm text-red-700">50m (single room)</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-white rounded">
+                                <span class="text-sm font-semibold">🏗️ Infrastructure</span>
+                                <span class="text-sm text-red-700">WiFi AP required ($50)</span>
+                            </div>
+                            <div class="border-t-2 border-orange-300 pt-2 mt-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold">💰 Cost/node:</span>
+                                    <span class="text-xl font-bold text-orange-900">$13 + infra</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 text-xs text-orange-700 italic">* Theoretical only - impractical, requires wall power in practice</div>
                     </div>
                 </div>
 
                 <div class="metric-card">
                     <h3 class="text-lg font-semibold text-[#8a7962] mb-4">LoRaWAN Approach</h3>
-                    <div class="code-block">
-Hardware:     STM32WL ($4) + BME280 ($8) + battery ($5)<br>
-Power:        12 mJ/msg → 1,027-year battery (truly wireless)<br>
-Range:        5-10 km (campus-scale)<br>
-Infrastructure: 1 gateway per 100 nodes ($200 ÷ 100 = $2/node)<br>
-Cost/node:    $19 total
+                    
+                    <!-- LoRaWAN Comparison Card -->
+                    <div class="bg-gradient-to-br from-green-50 to-blue-50 border-2 border-green-400 rounded-lg p-4">
+                        <div class="space-y-3">
+                            <div class="flex justify-between items-center p-2 bg-white rounded">
+                                <span class="text-sm font-semibold">💻 Hardware</span>
+                                <span class="text-sm">STM32WL + BME280</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-white rounded">
+                                <span class="text-sm font-semibold">⚡ Power</span>
+                                <span class="text-sm text-green-700">12 mJ/msg ✓</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-white rounded">
+                                <span class="text-sm font-semibold">🔋 Battery Life</span>
+                                <span class="text-sm text-green-700">1,027 years ✓</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-white rounded">
+                                <span class="text-sm font-semibold">📡 Range</span>
+                                <span class="text-sm text-green-700">5-10 km (campus-scale) ✓</span>
+                            </div>
+                            <div class="flex justify-between items-center p-2 bg-white rounded">
+                                <span class="text-sm font-semibold">🏗️ Infrastructure</span>
+                                <span class="text-sm text-green-700">1 gateway/100 nodes ($2/node) ✓</span>
+                            </div>
+                            <div class="border-t-2 border-green-300 pt-2 mt-2">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold">💰 Cost/node:</span>
+                                    <span class="text-xl font-bold text-green-900">$19 total</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3 flex gap-2 flex-wrap">
+                            <span class="text-xs bg-green-200 text-green-900 px-2 py-1 rounded font-semibold">Truly wireless</span>
+                            <span class="text-xs bg-blue-200 text-blue-900 px-2 py-1 rounded font-semibold">100× range</span>
+                            <span class="text-xs bg-purple-200 text-purple-900 px-2 py-1 rounded font-semibold">4.2× power savings</span>
+                        </div>
                     </div>
                 </div>
             </div>
