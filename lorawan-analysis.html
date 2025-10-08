@@ -209,7 +209,7 @@
                                         <span class="font-mono">0.86 J</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>RTC + peripherals</span>
+                                        <span>RTC + peripherals (24/7)</span>
                                         <span class="font-mono">0.43 J</span>
                                     </div>
                                     <div class="flex justify-between">
@@ -217,20 +217,24 @@
                                         <span class="font-mono">0.30 J</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>Sensor reads: 12× 5 mJ</span>
-                                        <span class="font-mono">0.06 J</span>
+                                        <span>MCU wake for ops: 12× 25 mJ</span>
+                                        <span class="font-mono">0.30 J</span>
+                                    </div>
+                                    <div class="flex justify-between text-gray-600">
+                                        <span class="italic">↳ Sensor read + compute</span>
+                                        <span class="font-mono text-gray-500">~25 mJ</span>
                                     </div>
                                     <div class="border-t-2 border-orange-300 pt-2 flex justify-between font-bold">
                                         <span>Total Daily:</span>
-                                        <span class="font-mono text-orange-700">1.65 J</span>
+                                        <span class="font-mono text-orange-700">1.89 J</span>
                                     </div>
                                 </div>
                                 
                                 <div class="bg-orange-100 rounded p-2 text-center">
                                     <div class="text-xs text-gray-600">Theoretical Battery Life @ 3000 mAh</div>
-                                    <div class="text-2xl font-bold text-orange-900 line-through opacity-50">45 years</div>
-                                    <div class="text-lg font-bold text-red-700">Real: 4-15 years</div>
-                                    <div class="text-xs text-red-600 mt-1 font-semibold">Self-discharge, temperature, and inefficiencies dominate. Solar recommended.</div>
+                                    <div class="text-2xl font-bold text-orange-900 line-through opacity-50">4.0 years</div>
+                                    <div class="text-lg font-bold text-red-700">Real: 0.5-1.5 years</div>
+                                    <div class="text-xs text-red-600 mt-1 font-semibold">Not practical for long-term battery operation. Wall power needed.</div>
                                 </div>
                             </div>
                         </div>
@@ -247,7 +251,7 @@
                                         <span class="font-mono">0.13 J</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>RTC + peripherals</span>
+                                        <span>RTC + peripherals (24/7)</span>
                                         <span class="font-mono">0.22 J</span>
                                     </div>
                                     <div class="flex justify-between">
@@ -255,24 +259,32 @@
                                         <span class="font-mono">0.072 J</span>
                                     </div>
                                     <div class="flex justify-between">
-                                        <span>Sensor reads: 24× 5 mJ</span>
-                                        <span class="font-mono">0.12 J</span>
+                                        <span>MCU wake for logs: 24× 20 mJ</span>
+                                        <span class="font-mono">0.48 J</span>
                                     </div>
                                     <div class="flex justify-between text-gray-600">
-                                        <span class="italic">Flash writes: 24× 0.5 mJ</span>
-                                        <span class="font-mono">0.012 J</span>
+                                        <span class="italic">↳ BME280 read (10 mA × 20 ms)</span>
+                                        <span class="font-mono text-gray-500">~0.7 mJ</span>
+                                    </div>
+                                    <div class="flex justify-between text-gray-600">
+                                        <span class="italic">↳ MCU active (15 mA × 100 ms)</span>
+                                        <span class="font-mono text-gray-500">~5 mJ</span>
+                                    </div>
+                                    <div class="flex justify-between text-gray-600">
+                                        <span class="italic">↳ Flash write + compute</span>
+                                        <span class="font-mono text-gray-500">~14 mJ</span>
                                     </div>
                                     <div class="border-t-2 border-green-300 pt-2 flex justify-between font-bold">
                                         <span>Total Daily:</span>
-                                        <span class="font-mono text-green-700">0.55 J</span>
+                                        <span class="font-mono text-green-700">0.90 J</span>
                                     </div>
                                 </div>
                                 
                                 <div class="bg-green-200 rounded p-2 text-center">
                                     <div class="text-xs text-gray-600">Theoretical Battery Life @ 3000 mAh</div>
-                                    <div class="text-2xl font-bold text-green-900 line-through opacity-50">13.5 years</div>
-                                    <div class="text-lg font-bold text-orange-700">Real: 1.5-4 years</div>
-                                    <div class="text-xs text-orange-600 mt-1 font-semibold">Solar panel strongly recommended for long-term deployment</div>
+                                    <div class="text-2xl font-bold text-green-900 line-through opacity-50">8.3 years</div>
+                                    <div class="text-lg font-bold text-orange-700">Real: 1-3 years</div>
+                                    <div class="text-xs text-orange-600 mt-1 font-semibold">Self-discharge + temperature losses. Solar strongly recommended.</div>
                                 </div>
                             </div>
                         </div>
@@ -281,12 +293,12 @@
 
                 <div class="bg-purple-50 border-l-4 border-purple-500 p-4 mb-4">
                     <h4 class="font-semibold text-purple-900 mb-2">💡 Smart Data Logging Strategy:</h4>
-                    <p class="text-purple-800 text-sm mb-2">Sensors can collect data continuously (every hour) while transmitting only 6× daily:</p>
+                    <p class="text-purple-800 text-sm mb-2">Sensors collect data continuously (every hour) while transmitting only 6× daily:</p>
                     <ul class="text-purple-800 text-sm space-y-1">
                         <li>• <strong>24 sensor readings/day</strong> → local flash storage (circadian resolution)</li>
                         <li>• <strong>6 transmissions/day</strong> → batch upload aggregated data + phase sync</li>
-                        <li>• <strong>Works during sleep</strong> → RTC wakes MCU for logging, no solar needed</li>
-                        <li>• <strong>Flash writes: ~0.5 mJ</strong> → negligible power cost for 24× daily logs</li>
+                        <li>• <strong>MCU wake-ups dominate power</strong> → 20 mJ per log event (sensor + compute + flash)</li>
+                        <li>• <strong>RTC wakes MCU</strong> → ~100 ms active @ 15 mA = most energy used</li>
                         <li>• <strong>Data recovery</strong> → if TX fails, data persists in flash for next sync</li>
                     </ul>
                 </div>
@@ -294,8 +306,8 @@
                 <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
                     <h4 class="font-semibold text-blue-900 mb-2">Key Insights (with Reality Check):</h4>
                     <ul class="text-blue-800 text-sm space-y-1">
-                        <li>• <strong>LoRaWAN provides 3× power savings over WiFi</strong> (0.55 J vs 1.65 J/day in theory)</li>
-                        <li>• <strong>Sleep current dominates</strong> - STM32WL's 1.5 µA vs ESP32's 10 µA matters most</li>
+                        <li>• <strong>LoRaWAN provides 2.1× power savings over WiFi</strong> (0.90 J vs 1.89 J/day theoretical)</li>
+                        <li>• <strong>MCU wake-ups now dominate</strong> - 0.48 J/day for 24 logging events (53% of total)</li>
                         <li>• <strong>24× hourly logging</strong> captures full circadian cycle without increasing TX load</li>
                         <li class="text-red-700 font-semibold">• <strong>Real deployments need solar:</strong> Self-discharge and environmental factors reduce battery life by 3-10×</li>
                         <li>• <strong>Best case real-world:</strong> 1.5-4 years on battery alone (LoRaWAN), weeks to months without optimization</li>
@@ -318,24 +330,24 @@
                             </thead>
                             <tbody>
                                 <tr class="border-t">
-                                    <td class="p-2"><strong>WiFi (6 msg/day)</strong></td>
-                                    <td class="p-2 text-right font-mono">1.65 J</td>
-                                    <td class="p-2 text-right font-bold text-gray-400 line-through">45 yrs</td>
-                                    <td class="p-2 text-right font-bold text-orange-700">4-15 yrs</td>
-                                    <td class="p-2 text-xs">Solar recommended</td>
+                                    <td class="p-2"><strong>WiFi (6 msg/day, 12 logs)</strong></td>
+                                    <td class="p-2 text-right font-mono">1.89 J</td>
+                                    <td class="p-2 text-right font-bold text-gray-400 line-through">4.0 yrs</td>
+                                    <td class="p-2 text-right font-bold text-orange-700">0.5-1.5 yrs</td>
+                                    <td class="p-2 text-xs">Not practical on battery</td>
                                 </tr>
                                 <tr class="border-t bg-green-50">
                                     <td class="p-2"><strong>LoRaWAN (6 msg/day, 24 logs)</strong></td>
-                                    <td class="p-2 text-right font-mono">0.55 J</td>
-                                    <td class="p-2 text-right font-bold text-gray-400 line-through">13.5 yrs</td>
-                                    <td class="p-2 text-right font-bold text-green-700">1.5-4 yrs</td>
+                                    <td class="p-2 text-right font-mono">0.90 J</td>
+                                    <td class="p-2 text-right font-bold text-gray-400 line-through">8.3 yrs</td>
+                                    <td class="p-2 text-right font-bold text-green-700">1-3 yrs</td>
                                     <td class="p-2 text-xs">Solar strongly recommended</td>
                                 </tr>
                                 <tr class="border-t bg-green-100">
                                     <td class="p-2"><strong>LoRaWAN (2 msg/day, 24 logs)</strong></td>
-                                    <td class="p-2 text-right font-mono">0.45 J</td>
-                                    <td class="p-2 text-right font-bold text-gray-400 line-through">16.6 yrs</td>
-                                    <td class="p-2 text-right font-bold text-green-900">2-5 yrs</td>
+                                    <td class="p-2 text-right font-mono">0.81 J</td>
+                                    <td class="p-2 text-right font-bold text-gray-400 line-through">9.2 yrs</td>
+                                    <td class="p-2 text-right font-bold text-green-900">1.5-3.5 yrs</td>
                                     <td class="p-2 text-xs">Best battery-only option</td>
                                 </tr>
                                 <tr class="border-t bg-blue-50">
