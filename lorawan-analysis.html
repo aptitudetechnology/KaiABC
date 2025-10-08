@@ -181,10 +181,19 @@
 
             <!-- Power -->
             <div id="power" class="metric-card mb-8">
-                <h3 class="text-xl font-semibold text-[#8a7962] mb-4">2. Power Consumption: Realistic Full-Device Analysis</h3>
+                <h3 class="text-xl font-semibold text-[#8a7962] mb-4">2. Power Consumption: Real-World Reality Check</h3>
 
-                <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6">
-                    <p class="text-yellow-900 text-sm"><strong>⚠️ Reality Check:</strong> Previous calculations only counted transmission energy. Real devices have MCU sleep current, sensor power, RTC, etc. Here's the <strong>complete power budget</strong>.</p>
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                    <p class="text-red-900 text-sm font-semibold"><strong>⚠️ IMPORTANT DISCLAIMER:</strong> The battery life calculations below are <strong>theoretical best-case scenarios</strong> that ignore many real-world factors:</p>
+                    <ul class="text-red-800 text-sm mt-2 space-y-1 ml-4 list-disc">
+                        <li><strong>Self-discharge:</strong> Li-ion batteries lose 2-5% capacity per month sitting idle (~20-50% per year)</li>
+                        <li><strong>Temperature effects:</strong> Cold weather dramatically reduces battery capacity and increases consumption</li>
+                        <li><strong>Voltage regulators:</strong> Real circuits have regulator losses (typically 10-20% overhead)</li>
+                        <li><strong>Component aging:</strong> Batteries degrade over time, reducing effective capacity</li>
+                        <li><strong>Network retries:</strong> Failed transmissions, re-joins, and gateway unavailability increase consumption</li>
+                        <li><strong>Leakage currents:</strong> PCB traces, protection diodes, and passive components consume power</li>
+                    </ul>
+                    <p class="text-red-900 text-sm mt-3 font-bold">Realistic expectation: Divide all battery life estimates by 3-10× for real deployments. Solar panels are typically required for multi-year operation.</p>
                 </div>
 
                 <div class="grid md:grid-cols-2 gap-6 mb-6">
@@ -218,9 +227,10 @@
                                 </div>
                                 
                                 <div class="bg-orange-100 rounded p-2 text-center">
-                                    <div class="text-xs text-gray-600">Realistic Battery Life @ 3000 mAh</div>
-                                    <div class="text-2xl font-bold text-orange-900">45 years</div>
-                                    <div class="text-xs text-gray-600 mt-1">Still impressive, but need wall power for practical deployment</div>
+                                    <div class="text-xs text-gray-600">Theoretical Battery Life @ 3000 mAh</div>
+                                    <div class="text-2xl font-bold text-orange-900 line-through opacity-50">45 years</div>
+                                    <div class="text-lg font-bold text-red-700">Real: 4-15 years</div>
+                                    <div class="text-xs text-red-600 mt-1 font-semibold">Self-discharge, temperature, and inefficiencies dominate. Solar recommended.</div>
                                 </div>
                             </div>
                         </div>
@@ -259,9 +269,10 @@
                                 </div>
                                 
                                 <div class="bg-green-200 rounded p-2 text-center">
-                                    <div class="text-xs text-gray-600">Realistic Battery Life @ 3000 mAh</div>
-                                    <div class="text-2xl font-bold text-green-900">13.5 years ✓</div>
-                                    <div class="text-xs text-green-800 mt-1 font-semibold">Practical decade-scale deployment!</div>
+                                    <div class="text-xs text-gray-600">Theoretical Battery Life @ 3000 mAh</div>
+                                    <div class="text-2xl font-bold text-green-900 line-through opacity-50">13.5 years</div>
+                                    <div class="text-lg font-bold text-orange-700">Real: 1.5-4 years</div>
+                                    <div class="text-xs text-orange-600 mt-1 font-semibold">Solar panel strongly recommended for long-term deployment</div>
                                 </div>
                             </div>
                         </div>
@@ -281,62 +292,92 @@
                 </div>
 
                 <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
-                    <h4 class="font-semibold text-blue-900 mb-2">Key Insights:</h4>
+                    <h4 class="font-semibold text-blue-900 mb-2">Key Insights (with Reality Check):</h4>
                     <ul class="text-blue-800 text-sm space-y-1">
-                        <li>• <strong>LoRaWAN provides 3× total power savings</strong> (0.55 J vs 1.65 J/day)</li>
-                        <li>• <strong>Sleep current still dominates</strong> - STM32WL's 1.5 µA vs ESP32's 10 µA is the real win</li>
+                        <li>• <strong>LoRaWAN provides 3× power savings over WiFi</strong> (0.55 J vs 1.65 J/day in theory)</li>
+                        <li>• <strong>Sleep current dominates</strong> - STM32WL's 1.5 µA vs ESP32's 10 µA matters most</li>
                         <li>• <strong>24× hourly logging</strong> captures full circadian cycle without increasing TX load</li>
-                        <li>• 13.5 years is <strong>practical</strong> for field deployment with continuous data collection</li>
-                        <li>• Can extend to 17+ years with 2 msg/day in steady-state sync</li>
+                        <li class="text-red-700 font-semibold">• <strong>Real deployments need solar:</strong> Self-discharge and environmental factors reduce battery life by 3-10×</li>
+                        <li>• <strong>Best case real-world:</strong> 1.5-4 years on battery alone (LoRaWAN), weeks to months without optimization</li>
+                        <li>• <strong>Practical solution:</strong> Small solar panel (0.5-1W) + battery extends to indefinite operation</li>
                     </ul>
                 </div>
 
-                <div class="bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-400 rounded-lg p-4">
-                    <h4 class="font-semibold text-gray-900 mb-3">Battery Life Scenarios (3000 mAh Li-Ion):</h4>
+                <div class="bg-gradient-to-r from-yellow-50 to-orange-50 border-2 border-orange-400 rounded-lg p-4">
+                    <h4 class="font-semibold text-gray-900 mb-3">Battery Life Scenarios (3000 mAh Li-Ion) - <span class="text-red-600">Theoretical vs Real-World</span>:</h4>
                     <div class="overflow-x-auto">
                         <table class="w-full text-sm">
                             <thead class="bg-gray-100">
                                 <tr>
                                     <th class="p-2 text-left">Configuration</th>
                                     <th class="p-2 text-right">Daily Energy</th>
-                                    <th class="p-2 text-right">Battery Life</th>
-                                    <th class="p-2 text-left">Use Case</th>
+                                    <th class="p-2 text-right">Theoretical</th>
+                                    <th class="p-2 text-right">Real-World</th>
+                                    <th class="p-2 text-left">Deployment</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr class="border-t">
                                     <td class="p-2"><strong>WiFi (6 msg/day)</strong></td>
                                     <td class="p-2 text-right font-mono">1.65 J</td>
-                                    <td class="p-2 text-right font-bold text-orange-700">45 years</td>
-                                    <td class="p-2 text-xs">Prototyping only</td>
+                                    <td class="p-2 text-right font-bold text-gray-400 line-through">45 yrs</td>
+                                    <td class="p-2 text-right font-bold text-orange-700">4-15 yrs</td>
+                                    <td class="p-2 text-xs">Solar recommended</td>
                                 </tr>
                                 <tr class="border-t bg-green-50">
                                     <td class="p-2"><strong>LoRaWAN (6 msg/day, 24 logs)</strong></td>
                                     <td class="p-2 text-right font-mono">0.55 J</td>
-                                    <td class="p-2 text-right font-bold text-green-700">13.5 years</td>
-                                    <td class="p-2 text-xs">Rapid sync + hourly data</td>
+                                    <td class="p-2 text-right font-bold text-gray-400 line-through">13.5 yrs</td>
+                                    <td class="p-2 text-right font-bold text-green-700">1.5-4 yrs</td>
+                                    <td class="p-2 text-xs">Solar strongly recommended</td>
                                 </tr>
                                 <tr class="border-t bg-green-100">
                                     <td class="p-2"><strong>LoRaWAN (2 msg/day, 24 logs)</strong></td>
                                     <td class="p-2 text-right font-mono">0.45 J</td>
-                                    <td class="p-2 text-right font-bold text-green-900">16.6 years</td>
-                                    <td class="p-2 text-xs">Steady-state + continuous monitoring</td>
-                                </tr>
-                                <tr class="border-t bg-purple-50">
-                                    <td class="p-2"><strong>LoRaWAN (6 msg/day, 288 logs)</strong></td>
-                                    <td class="p-2 text-right font-mono">0.67 J</td>
-                                    <td class="p-2 text-right font-bold text-purple-700">11.2 years</td>
-                                    <td class="p-2 text-xs">5-min resolution data logging</td>
+                                    <td class="p-2 text-right font-bold text-gray-400 line-through">16.6 yrs</td>
+                                    <td class="p-2 text-right font-bold text-green-900">2-5 yrs</td>
+                                    <td class="p-2 text-xs">Best battery-only option</td>
                                 </tr>
                                 <tr class="border-t bg-blue-50">
-                                    <td class="p-2"><strong>LoRaWAN + Solar</strong></td>
-                                    <td class="p-2 text-right font-mono">0.55 J</td>
-                                    <td class="p-2 text-right font-bold text-blue-700">∞ years</td>
-                                    <td class="p-2 text-xs">Permanent deployment, any log rate</td>
+                                    <td class="p-2"><strong>LoRaWAN + 1W Solar Panel</strong></td>
+                                    <td class="p-2 text-right font-mono">Net positive</td>
+                                    <td class="p-2 text-right font-bold text-blue-700" colspan="2">Indefinite</td>
+                                    <td class="p-2 text-xs font-semibold">✓ Recommended for production</td>
+                                </tr>
+                                <tr class="border-t bg-purple-50">
+                                    <td class="p-2"><strong>Unoptimized ESP32 (WiFi always-on)</strong></td>
+                                    <td class="p-2 text-right font-mono">~50 J</td>
+                                    <td class="p-2 text-right font-bold text-gray-400 line-through">~1 yr</td>
+                                    <td class="p-2 text-right font-bold text-red-700">2-4 weeks</td>
+                                    <td class="p-2 text-xs">Prototype only - impractical</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+                    
+                    <div class="mt-4 bg-yellow-100 border border-yellow-400 rounded p-3">
+                        <p class="text-sm text-yellow-900"><strong>Why the huge gap?</strong> Real-world factors ignored by theoretical calculations:</p>
+                        <ul class="text-xs text-yellow-800 mt-2 space-y-1 ml-4 list-disc">
+                            <li><strong>Battery self-discharge:</strong> ~3-5%/month = 36-60%/year capacity loss even without use</li>
+                            <li><strong>Temperature:</strong> -20°C can reduce capacity by 50%, cold increases MCU power draw</li>
+                            <li><strong>Voltage regulator losses:</strong> 10-20% efficiency overhead not accounted for</li>
+                            <li><strong>Network retries:</strong> Gateway downtime, poor signal → 2-5× transmission attempts</li>
+                            <li><strong>Leakage current:</strong> PCB traces, protection circuits, sensors in "off" mode</li>
+                            <li><strong>Battery degradation:</strong> Capacity drops 20% per year, internal resistance increases</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 mt-6">
+                    <h4 class="font-semibold text-green-900 mb-2">✓ Practical Deployment Recommendations:</h4>
+                    <ul class="text-green-800 text-sm space-y-2">
+                        <li><strong>1. Always use solar panels:</strong> Even a small 0.5-1W panel + 3000mAh battery = indefinite operation</li>
+                        <li><strong>2. Oversize batteries:</strong> Use 5000-10000 mAh for multi-year battery-only operation</li>
+                        <li><strong>3. Test in real conditions:</strong> Lab tests are worthless - deploy test units in actual environment for 1-3 months</li>
+                        <li><strong>4. Temperature compensation:</strong> Use temperature-rated batteries (LiPo for 0-45°C, LiFePO4 for -20-60°C)</li>
+                        <li><strong>5. Plan for replacement:</strong> Budget for battery/node replacement every 2-3 years regardless of calculations</li>
+                        <li><strong>6. Monitor voltage:</strong> Include battery voltage in transmitted data to predict failures</li>
+                    </ul>
                 </div>
             </div>
 
