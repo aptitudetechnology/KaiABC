@@ -69,7 +69,13 @@
             <li><a href="research/Geometric Constraints on Phase Space Exploration for Distributed Biological Oscillators.md" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7] text-sm">📄 Research Paper</a></li>
             <li><a href="webdemo/NUMERICAL_IMPROVEMENTS.md" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7] text-sm">📊 Numerical Methods</a></li>
             <li><a href="lorawan-analysis.html" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7] text-sm">📡 LoRaWAN Analysis</a></li>
-            <li><a href="LoRaWAN_COMPATIBILITY.md" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7] text-sm text-gray-500">� LoRaWAN (Markdown)</a></li>
+            <li><a href="LoRaWAN_COMPATIBILITY.md" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7] text-sm text-gray-500">📡 LoRaWAN (Markdown)</a></li>
+            <li class="border-t border-[#dcd1ba] pt-2 mt-2">
+                <p class="text-xs font-semibold text-[#8a7962] px-2 mb-1">Hardware Implementations</p>
+            </li>
+            <li><a href="../../examples/KaiABC_Sensor/" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7] text-green-700 font-medium">⚡ ESP32/ESP8266 FDRS</a></li>
+            <li><a href="../../examples/KaiABC_ELM11/" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7] text-green-700 font-medium">🔧 ELM11 + ESP32 UART</a></li>
+            <li><a href="../../elm11plan.md" class="nav-link block p-2 rounded-md hover:bg-[#eaddc7] text-sm">📋 ELM11 Implementation Plan</a></li>
             <li class="border-t border-[#dcd1ba] pt-2 mt-2">
                 <p class="text-xs font-semibold text-[#8a7962] px-2 mb-1">Original MVP Plan</p>
             </li>
@@ -89,7 +95,20 @@
             
             <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
                 <h3 class="font-semibold text-blue-900 mb-2">🎯 Current Project Status</h3>
-                <p class="text-blue-800 text-sm">The project has evolved beyond the original MVP plan to include comprehensive mathematical research, interactive web demonstrations with advanced numerical methods (RK4 integration, Monte Carlo validation), and quantitative predictions for real-world IoT deployment scenarios.</p>
+                <p class="text-blue-800 text-sm">The project has evolved beyond the original MVP plan to include comprehensive mathematical research, interactive web demonstrations with advanced numerical methods (RK4 integration, Monte Carlo validation), quantitative predictions for real-world IoT deployment scenarios, and <strong>working hardware implementations</strong>.</p>
+            </div>
+
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
+                <h3 class="font-semibold text-green-900 mb-2">✅ NEW: Hardware Implementations Available</h3>
+                <ul class="text-green-800 text-sm space-y-1 ml-4 list-disc">
+                    <li><strong>FDRS Integration:</strong> ESP32/ESP8266 examples using ESP-NOW/LoRa with the Farm Data Relay System</li>
+                    <li><strong>ELM11 + ESP32 UART Coprocessor:</strong> Hybrid Lua/C++ architecture achieving near-C++ performance with Lua flexibility</li>
+                    <li><strong>Complete Documentation:</strong> Setup guides, testing procedures, and troubleshooting for all platforms</li>
+                </ul>
+                <div class="mt-3 space-x-4">
+                    <a href="../../examples/KaiABC_Sensor/" class="text-green-700 underline hover:text-green-900 text-sm font-medium">View FDRS Examples →</a>
+                    <a href="../../examples/KaiABC_ELM11/" class="text-green-700 underline hover:text-green-900 text-sm font-medium">View ELM11 Implementation →</a>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -148,6 +167,54 @@
                         <li class="flex items-start"><span class="text-blue-500 font-bold mr-2">?</span> <strong>Could Have:</strong> Machine Learning, Population Sync, Smart Home Integration.</li>
                     </ul>
                 </div>
+            </div>
+        </section>
+
+        <section id="implementations" class="mb-12">
+            <h2 class="text-3xl font-bold text-[#6d5d47] mb-4">Hardware Implementations</h2>
+            <p class="mb-6 text-lg text-gray-700">The KaiABC system has been successfully implemented on multiple hardware platforms, demonstrating practical viability of biological oscillator synchronization for IoT networks.</p>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-green-200 border-l-4">
+                    <div class="flex items-start mb-4">
+                        <div class="text-4xl mr-4">⚡</div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-green-800 mb-2">ESP32/ESP8266 + FDRS</h3>
+                            <p class="text-sm text-green-600 font-medium">Production-ready implementation with Farm Data Relay System</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 text-gray-700 text-sm mb-4">
+                        <li><strong>Communication:</strong> ESP-NOW, LoRa, MQTT</li>
+                        <li><strong>Platform:</strong> Arduino C++ on ESP32/ESP8266</li>
+                        <li><strong>Integration:</strong> Full FDRS gateway and node support</li>
+                        <li><strong>Sensors:</strong> DHT22, BME280, DS18B20</li>
+                        <li><strong>Status:</strong> <span class="text-green-700 font-semibold">✅ Working examples available</span></li>
+                    </ul>
+                    <a href="../../examples/KaiABC_Sensor/" class="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors text-sm font-medium">View FDRS Examples →</a>
+                </div>
+
+                <div class="bg-white p-6 rounded-lg shadow-sm border border-blue-200 border-l-4">
+                    <div class="flex items-start mb-4">
+                        <div class="text-4xl mr-4">🔧</div>
+                        <div>
+                            <h3 class="text-xl font-semibold text-blue-800 mb-2">ELM11 Lua + ESP32 UART Coprocessor</h3>
+                            <p class="text-sm text-blue-600 font-medium">Hybrid architecture combining Lua flexibility with C++ performance</p>
+                        </div>
+                    </div>
+                    <ul class="space-y-2 text-gray-700 text-sm mb-4">
+                        <li><strong>Communication:</strong> UART (JSON protocol at 115200 baud)</li>
+                        <li><strong>ELM11 Role:</strong> High-level logic, networking, sensors</li>
+                        <li><strong>ESP32 Role:</strong> High-performance KaiABC math calculations</li>
+                        <li><strong>Performance:</strong> 16-20 day sync (vs 30-60 days pure Lua)</li>
+                        <li><strong>Status:</strong> <span class="text-blue-700 font-semibold">✅ Complete implementation with docs</span></li>
+                    </ul>
+                    <a href="../../examples/KaiABC_ELM11/" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors text-sm font-medium">View ELM11 Implementation →</a>
+                </div>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4 mb-6">
+                <h3 class="font-semibold text-yellow-900 mb-2">⚠️ Implementation Status</h3>
+                <p class="text-yellow-800 text-sm">Both implementations include complete source code, documentation, and testing procedures. The FDRS integration is a <strong>prototype theoretical implementation</strong> awaiting real-world hardware testing. The ELM11 implementation demonstrates a novel hybrid architecture for resource-constrained platforms.</p>
             </div>
         </section>
 

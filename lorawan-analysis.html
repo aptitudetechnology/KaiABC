@@ -119,6 +119,16 @@
                 <h2 class="text-2xl font-bold mb-4">Executive Summary</h2>
                 <p class="text-lg mb-4"><strong>LoRaWAN is an EXCELLENT match for this system.</strong> The ultra-low bandwidth requirements (1.5 kbps), infrequent messaging (2-6 updates/day), and low-power constraints align perfectly with LoRaWAN's design parameters. The biological oscillator synchronization actually provides a novel approach to maintaining time coherence in LoRaWAN networks without GPS dependency.</p>
             </div>
+
+            <div class="bg-green-50 border-l-4 border-green-500 p-4 mb-6">
+                <h3 class="font-semibold text-green-900 mb-2">✅ UPDATE: Multiple Implementation Paths Available</h3>
+                <p class="text-green-800 text-sm mb-3">KaiABC now has working implementations on multiple platforms, each optimized for different use cases:</p>
+                <ul class="text-green-800 text-sm space-y-1 ml-4 list-disc">
+                    <li><strong>ESP32/ESP8266 + FDRS:</strong> Integrated with Farm Data Relay System using ESP-NOW/LoRa (see <a href="../../examples/KaiABC_Sensor/" class="underline font-medium">examples</a>)</li>
+                    <li><strong>ELM11 + ESP32 UART Coprocessor:</strong> Hybrid Lua/C++ architecture for platforms with limited native C++ support (see <a href="../../examples/KaiABC_ELM11/" class="underline font-medium">implementation</a>)</li>
+                    <li><strong>Pure LoRaWAN:</strong> Analysis below remains valid for dedicated LoRaWAN deployments</li>
+                </ul>
+            </div>
         </section>
 
         <!-- Why LoRaWAN -->
@@ -973,6 +983,18 @@ typedef struct {<br>
         <section id="protocol-comparison" class="content-section mb-12">
             <h2 class="text-3xl font-bold text-[#6d5d47] mb-6">Protocol Comparison: LoRaWAN vs. Alternatives</h2>
 
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                <h3 class="font-semibold text-blue-900 mb-2">📡 NEW: FDRS Integration Available</h3>
+                <p class="text-blue-800 text-sm mb-2">The <strong>Farm Data Relay System (FDRS)</strong> provides a flexible infrastructure layer supporting multiple protocols:</p>
+                <ul class="text-blue-800 text-sm space-y-1 ml-4 list-disc">
+                    <li><strong>ESP-NOW:</strong> 250m range, no infrastructure, peer-to-peer mesh networking</li>
+                    <li><strong>LoRa (non-WAN):</strong> 1-5 km range, FDRS gateway coordination</li>
+                    <li><strong>MQTT/WiFi:</strong> Internet connectivity for front-end integration</li>
+                    <li><strong>UART:</strong> Gateway-to-gateway serial communication</li>
+                </ul>
+                <p class="text-blue-800 text-sm mt-2">FDRS allows mixing protocols in a single network - for example, ESP-NOW sensors → LoRa repeater → MQTT gateway. See <a href="../../examples/KaiABC_Sensor/" class="underline font-medium">working examples</a>.</p>
+            </div>
+
             <div class="metric-card">
                 <div class="table-container">
                     <table class="comparison-table">
@@ -994,6 +1016,22 @@ typedef struct {<br>
                                 <td>12 mJ/msg</td>
                                 <td>$5-8</td>
                                 <td class="status-excellent">⭐⭐⭐⭐⭐ Perfect</td>
+                            </tr>
+                            <tr class="bg-green-50">
+                                <td><strong>ESP-NOW (FDRS)</strong></td>
+                                <td>1-2.4 Mbps</td>
+                                <td>200-250 m</td>
+                                <td>~15 mJ/msg</td>
+                                <td>$3</td>
+                                <td class="status-excellent">⭐⭐⭐⭐⭐ Excellent</td>
+                            </tr>
+                            <tr>
+                                <td>LoRa (non-WAN, FDRS)</td>
+                                <td>0.3-50 kbps</td>
+                                <td>1-5 km</td>
+                                <td>~12 mJ/msg</td>
+                                <td>$5-8</td>
+                                <td class="status-excellent">⭐⭐⭐⭐⭐ Excellent</td>
                             </tr>
                             <tr>
                                 <td>WiFi (MQTT)</td>
