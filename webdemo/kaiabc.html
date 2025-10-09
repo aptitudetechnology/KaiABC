@@ -18,7 +18,7 @@
             width: 100%;
             max-width: 600px;
             margin: 0 auto;
-            height: 350px;
+            height: 500px;
         }
         .view-content {
             display: none;
@@ -503,6 +503,19 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Performance View -->
+            <div id="performance-view" class="view-content">
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4">System Comparison</h2>
+                    <p class="text-sm text-slate-600 mb-4">
+                        Multi-dimensional comparison of time synchronization systems. Higher values are better for all metrics.
+                    </p>
+                    <div class="chart-container">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -699,17 +712,65 @@
             const ctx = document.getElementById('radarChart');
             if (!ctx) return;
 
+            const radarData = [
+                { metric: 'Low Power', GPS: 20, NTP: 10, RTC: 95, KaiABC: 100 },
+                { metric: 'Accuracy', GPS: 100, NTP: 95, RTC: 30, KaiABC: 85 },
+                { metric: 'Low Cost', GPS: 50, NTP: 70, RTC: 95, KaiABC: 85 },
+                { metric: 'Easy Deploy', GPS: 70, NTP: 40, RTC: 90, KaiABC: 95 },
+                { metric: 'Resilience', GPS: 40, NTP: 30, RTC: 60, KaiABC: 90 },
+                { metric: 'No Infrastructure', GPS: 50, NTP: 20, RTC: 100, KaiABC: 100 }
+            ];
+
             new Chart(ctx, {
                 type: 'radar',
                 data: {
-                    labels: ['Power Efficiency', 'Accuracy', 'Cost', 'Deployment'],
-                    datasets: hardwareComparison.map(item => ({
-                        label: item.system,
-                        data: [item.power, item.accuracy, item.cost, item.deployment],
-                        borderColor: item.system === 'KaiABC' ? '#10b981' : '#6b7280',
-                        backgroundColor: item.system === 'KaiABC' ? 'rgba(16, 185, 129, 0.2)' : 'rgba(107, 114, 128, 0.2)',
-                        borderWidth: item.system === 'KaiABC' ? 3 : 1
-                    }))
+                    labels: radarData.map(item => item.metric),
+                    datasets: [
+                        {
+                            label: 'GPS',
+                            data: radarData.map(item => item.GPS),
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#ef4444',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4
+                        },
+                        {
+                            label: 'NTP',
+                            data: radarData.map(item => item.NTP),
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#f59e0b',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4
+                        },
+                        {
+                            label: 'RTC',
+                            data: radarData.map(item => item.RTC),
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#3b82f6',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4
+                        },
+                        {
+                            label: 'KaiABC',
+                            data: radarData.map(item => item.KaiABC),
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.5)',
+                            borderWidth: 3,
+                            pointBackgroundColor: '#10b981',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2,
+                            pointRadius: 5
+                        }
+                    ]
                 },
                 options: {
                     responsive: true,
@@ -717,23 +778,36 @@
                     scales: {
                         r: {
                             beginAtZero: true,
+                            max: 100,
                             ticks: {
-                                callback: function(value, index, values) {
-                                    // Custom labels for different metrics
-                                    const labels = ['Power (mA)', 'Accuracy (%)', 'Cost ($)', 'Deployment (%)'];
-                                    return labels[index] + ': ' + value;
+                                stepSize: 20
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            angleLines: {
+                                color: 'rgba(0, 0, 0, 0.1)'
+                            },
+                            pointLabels: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
                                 }
                             }
                         }
                     },
                     plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    const metric = context.datasetIndex;
-                                    const value = context.parsed.r;
-                                    const labels = ['Power: ', 'Accuracy: ', 'Cost: $', 'Deployment: '];
-                                    return context.dataset.label + ' - ' + labels[metric] + value + (metric === 2 ? '' : (metric === 0 ? 'mA' : '%'));
+                                    return context.dataset.label + ': ' + context.parsed.r;
                                 }
                             }
                         }
