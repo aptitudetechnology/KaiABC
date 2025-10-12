@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KaiABC Circadian Oscillator MVP Plan</title>
+    <title>Kuramoto Basin Volume Scaling Research</title>
     <!-- Chosen Palette: Calm Harmony -->
     <!-- Application Structure Plan: The application is designed as an interactive single-page dashboard with a fixed sidebar navigation. This structure was chosen to transform the dense, linear research document into a non-linear, explorable experience. Users can immediately grasp the project's scope from the 'Overview' and then dive into specific areas like the 'Core Model Simulation', 'Roadmap', or 'System Architecture' in any order. Key interactions include a live, parameter-driven chart for the oscillator model, which makes the core scientific concept tangible and demonstrates the effect of environmental inputs. An interactive timeline for the roadmap and accordions for research questions further break down complex information into digestible chunks. This task-oriented design prioritizes user understanding and engagement over simply re-presenting the report's text. -->
     <!-- Visualization & Content Choices: 
-        - Report Info: KaiABC System Overview -> Goal: Organize/Inform -> Method: HTML/Tailwind Diagram -> Interaction: Static visual summary for quick comprehension. Justification: A visual map is more intuitive than text for system relationships.
-        - Report Info: KaiABC Mathematical Model -> Goal: Change/Relationships -> Method: Live Chart.js Line Chart -> Interaction: Sliders for temperature and ATP ratio dynamically update the oscillation simulation. Justification: This is the core 'wow' factor, making the abstract model concrete and interactive.
-        - Report Info: MVP Development Roadmap -> Goal: Organize/Inform -> Method: Interactive HTML/Tailwind Stepper/Timeline -> Interaction: Clicking a phase reveals its details. Justification: Breaks the development plan into clear, sequential steps.
+        - Report Info: Kuramoto Basin Scaling Overview -> Goal: Organize/Inform -> Method: HTML/Tailwind Diagram -> Interaction: Static visual summary for quick comprehension. Justification: A visual map is more intuitive than text for system relationships.
+        - Report Info: Kuramoto Mathematical Model -> Goal: Change/Relationships -> Method: Live Chart.js Line Chart -> Interaction: Sliders for temperature and ATP ratio dynamically update the oscillation simulation. Justification: This is the core 'wow' factor, making the abstract model concrete and interactive.
+        - Report Info: Research Development Roadmap -> Goal: Organize/Inform -> Method: Interactive HTML/Tailwind Stepper/Timeline -> Interaction: Clicking a phase reveals its details. Justification: Breaks the development plan into clear, sequential steps.
         - Report Info: Key Research Questions -> Goal: Organize -> Method: HTML/Tailwind Accordion -> Interaction: Clicking a category expands to show questions. Justification: Manages a large amount of text by categorizing it and hiding details until requested.
         - Library/Method: All visualizations are built using Chart.js for the canvas-based chart and custom HTML/Tailwind for diagrams and UI elements, adhering to the NO SVG/Mermaid requirement. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
@@ -91,7 +91,7 @@
         
         <section id="overview" class="mb-12">
             <h2 class="text-3xl font-bold text-[#6d5d47] mb-4">Project Overview</h2>
-            <p class="mb-6 text-lg text-gray-700">This project explores distributed biological oscillator synchronization through the lens of the <strong>Kakeya Conjecture</strong> (Wang & Zahl, 2025). We connect cutting-edge geometric measure theory to practical IoT applications using the cyanobacterial KaiABC circadian clock as a temperature-compensated oscillator. The research demonstrates how fundamental mathematics can inform ultra-low-power distributed timing systems.</p>
+            <p class="mb-6 text-lg text-gray-700">This project explores the fundamental scaling laws governing synchronization in the Kuramoto model, uncovering a surprising √N scaling in basin volumes that challenges current theoretical understanding. We connect advanced dynamical systems analysis to practical IoT applications using the cyanobacterial KaiABC circadian clock as a temperature-compensated oscillator. The research demonstrates how statistical complexity in high-dimensional phase spaces can drive unexpected scaling behaviors in distributed timing systems.</p>
             
             <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
                 <h3 class="font-semibold text-blue-900 mb-2">🎯 Current Project Status</h3>
@@ -114,8 +114,8 @@
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 <div class="bg-gradient-to-br from-green-50 to-green-100 p-4 rounded-lg border border-green-200">
                     <div class="text-3xl mb-2">📐</div>
-                    <h4 class="font-bold text-green-900 text-sm mb-1">Kakeya Conjecture Application</h4>
-                    <p class="text-xs text-green-700">Novel connection between 3D geometric measure theory and N-oscillator phase space</p>
+                    <h4 class="font-bold text-green-900 text-sm mb-1">Kuramoto Basin Scaling</h4>
+                    <p class="text-xs text-green-700">Discovery of V ~ exp(-√N) scaling in synchronization basin volumes despite constant effective DOF</p>
                 </div>
                 <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
                     <div class="text-3xl mb-2">🧮</div>
@@ -130,7 +130,7 @@
                 <div class="bg-gradient-to-br from-orange-50 to-orange-100 p-4 rounded-lg border border-orange-200">
                     <div class="text-3xl mb-2">🎮</div>
                     <h4 class="font-bold text-orange-900 text-sm mb-1">Interactive Demo</h4>
-                    <p class="text-xs text-orange-700">Real-time sync visualization, basin volume prediction, Q10 comparison tables</p>
+                    <p class="text-xs text-orange-700">Explore the √N basin scaling paradox with interactive hypothesis testing and empirical data visualization</p>
                 </div>
             </div>
             
