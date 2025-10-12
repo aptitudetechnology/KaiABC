@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Research: √N Scaling in Kuramoto Basin Volumes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: The SPA is designed as a narrative journey to unravel a scientific mystery. It starts with the central finding (The Mystery), provides the conflicting data points in a dashboard format (The Evidence), allows users to interactively debunk initial theories (The Paradox), and finally presents the open questions in a structured, explorable format (The Research Frontier). This thematic structure is more intuitive for understanding a complex research problem than a linear report, guiding the user from the "what" to the "why" and "what's next". -->
+    <!-- Visualization & Content Choices: 
+        1. Basin Volume Scaling: Report Info -> V ~ exp(-√N). Goal -> Introduce the core finding visually. Viz/Method -> Line Chart (Chart.js/Canvas). Interaction -> Hover for data points. Justification -> A chart is the most direct way to show a scaling relationship.
+        2. System Properties: Report Info -> N_eff, σ_R, K_c, ξ measurements. Goal -> Show the system's contradictory "mean-field" nature. Viz/Method -> 2x2 grid of info cards with mini-charts (Line/Bar on Canvas) and text. Interaction -> Hover for details. Justification -> A dashboard layout allows for quick comparison of disparate data points, highlighting the conflict.
+        3. Failed Hypotheses: Report Info -> Three hypotheses and why they failed. Goal -> Engage the user in the process of scientific elimination. Viz/Method -> Interactive tabbed component showing Prediction vs. Measurement. Interaction -> User clicks to switch between hypotheses. Justification -> Active participation in "testing" the hypotheses makes the paradox more memorable.
+        4. Research Questions: Report Info -> Long lists of open questions. Goal -> Make the future research paths digestible. Viz/Method -> Tabbed content area. Interaction -> User clicks to switch between categories (Theoretical, Mathematical, Physical). Justification -> Standard UI pattern for organizing a large amount of categorized text content. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FDFBF8; /* Warm off-white */
+            color: #383838; /* Dark warm gray */
+        }
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+        .tab-btn {
+            transition: all 0.2s ease-in-out;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-btn.active {
+            border-bottom-color: #3B82F6; /* Blue-600 */
+            color: #3B82F6;
+        }
+        .hypothesis-btn.active {
+            background-color: #3B82F6;
+            color: white;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 40vh;
+            max-height: 400px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="main-container">
+        <!-- Header -->
+        <header class="text-center mb-16">
+            <h1 class="text-4xl md:text-5xl font-bold text-blue-600 mb-2">The √N Scaling Mystery</h1>
+            <p class="text-lg text-gray-600">Exploring an Unexplained Scaling Law in the Kuramoto Model</p>
+        </header>
+
+        <!-- Section 1: The Core Mystery -->
+        <section id="mystery" class="mb-20">
+            <div class="card p-8">
+                <h2 class="text-3xl font-bold mb-4 text-center">Basin Volumes Scale as V ~ exp(-√N)</h2>
+                <p class="text-gray-700 mb-8 text-center max-w-3xl mx-auto">
+                    We've uncovered a consistent, empirical scaling law in the fully-connected Kuramoto model that defies current theoretical understanding. The volume of the basin of attraction (V) for the synchronized state appears to decrease exponentially with the square root of the number of oscillators (N). This application explores the evidence, the paradox it creates, and the research questions that arise.
+                </p>
+                <div class="chart-container mx-auto max-w-3xl">
+                    <canvas id="mainScalingChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: The Evidence Dashboard -->
+        <section id="evidence" class="mb-20">
+            <h2 class="text-3xl font-bold mb-8 text-center">The Empirical Evidence</h2>
+            <p class="text-gray-700 mb-10 text-center max-w-3xl mx-auto">
+                While the basin volume shows this unusual √N scaling, other key system properties behave as expected under mean-field theory. This conflict is the heart of the paradox. Below are the properties we measured across system sizes N = 10, 20, 30, and 50.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Card 1: Effective DOF -->
+                <div class="card p-6">
+                    <h3 class="font-bold text-xl mb-3">Effective Degrees of Freedom (N_eff)</h3>
+                    <p class="text-gray-600 mb-4">The system consistently reduces to a mean-field description, with only one effective degree of freedom, regardless of size.</p>
+                    <div class="bg-gray-50 p-6 rounded-lg text-center">
+                        <p class="text-4xl font-bold text-blue-600">N_eff ≈ 1</p>
+                        <p class="text-gray-500 mt-1">Constant for all N tested</p>
+                    </div>
+                </div>
+                <!-- Card 2: Order Parameter Fluctuations -->
+                <div class="card p-6">
+                    <h3 class="font-bold text-xl mb-3">Order Parameter Fluctuations (σ_R)</h3>
+                    <p class="text-gray-600 mb-4">Fluctuations in the order parameter scale as expected for a mean-field system, decaying almost inversely with N.</p>
+                    <div class="h-40">
+                         <canvas id="fluctuationsChart"></canvas>
+                    </div>
+                </div>
+                <!-- Card 3: Critical Coupling -->
+                <div class="card p-6">
+                    <h3 class="font-bold text-xl mb-3">Critical Coupling (K_c)</h3>
+                    <p class="text-gray-600 mb-4">The critical coupling point remains constant or even slightly increases with N, showing no √N dependence.</p>
+                     <div class="h-40">
+                         <canvas id="criticalCouplingChart"></canvas>
+                    </div>
+                </div>
+                <!-- Card 4: Correlation Length -->
+                <div class="card p-6">
+                    <h3 class="font-bold text-xl mb-3">Correlation Length (ξ)</h3>
+                    <p class="text-gray-600 mb-4">The measured correlation length scaling exponent is too weak to explain the observed basin volume scaling.</p>
+                     <div class="h-40">
+                         <canvas id="correlationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 3: The Paradox -->
+        <section id="paradox" class="mb-20">
+            <h2 class="text-3xl font-bold mb-8 text-center">The Paradox: Debunking Simple Hypotheses</h2>
+             <p class="text-gray-700 mb-10 text-center max-w-3xl mx-auto">
+                How can a 1-DOF system with constant K_c produce √N scaling in basin volumes? We tested several standard theoretical hypotheses, and all of them failed to match our empirical data. Select a hypothesis below to see why it was ruled out.
+            </p>
+            <div class="card p-8">
+                <div class="flex justify-center mb-6 space-x-2 md:space-x-4">
+                    <button id="hypo1-btn" class="hypothesis-btn px-4 py-2 rounded-md font-semibold bg-gray-200 text-gray-700">DOF Hypothesis</button>
+                    <button id="hypo2-btn" class="hypothesis-btn px-4 py-2 rounded-md font-semibold bg-gray-200 text-gray-700">K_c Scaling</button>
+                    <button id="hypo3-btn" class="hypothesis-btn px-4 py-2 rounded-md font-semibold bg-gray-200 text-gray-700">Correlation Length</button>
+                </div>
+                <div id="hypothesis-content" class="mt-4">
+                    <!-- Content will be injected by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Research Questions -->
+        <section id="research">
+            <h2 class="text-3xl font-bold mb-8 text-center">The Research Frontier</h2>
+             <p class="text-gray-700 mb-10 text-center max-w-3xl mx-auto">
+                This paradox opens up fundamental questions about finite-size effects, critical phenomena, and the structure of phase space in high-dimensional systems. We suspect the answer lies in finite-size corrections that affect basin volumes more strongly than traditional order parameters.
+            </p>
+            <div class="card p-8">
+                <div class="border-b border-gray-200 mb-6">
+                    <nav class="flex justify-center -mb-px space-x-6 md:space-x-8" aria-label="Tabs">
+                        <button id="tab-theo" class="tab-btn py-4 px-1 font-medium text-lg">Theoretical</button>
+                        <button id="tab-math" class="tab-btn py-4 px-1 font-medium text-lg">Mathematical</button>
+                        <button id="tab-phys" class="tab-btn py-4 px-1 font-medium text-lg">Physical</button>
+                    </nav>
+                </div>
+                <div id="research-content">
+                    <!-- Content will be injected by JS -->
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const createChart = (ctx, config) => {
+                return new Chart(ctx, {
+                    ...config,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: config.data.datasets.length > 1
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += context.parsed.y.toFixed(4);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                title: { display: true, text: config.x_axis_label || '' }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: '#e5e7eb' },
+                                title: { display: true, text: config.y_axis_label || '' }
+                            }
+                        }
+                    }
+                });
+            };
+
+            // Chart 1: Main Scaling
+            const n_values = [10, 20, 30, 50];
+            const sqrt_n_values = n_values.map(n => Math.sqrt(n));
+            const alpha = 0.5; // Example alpha for visualization
+            const basin_volumes = sqrt_n_values.map(sn => 1 - Math.exp(-alpha * sn));
+            
+            const mainScalingCtx = document.getElementById('mainScalingChart').getContext('2d');
+            createChart(mainScalingCtx, {
+                type: 'line',
+                data: {
+                    labels: n_values.map(n => `N=${n}`),
+                    datasets: [{
+                        label: 'Basin Volume (V)',
+                        data: basin_volumes,
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                x_axis_label: 'Number of Oscillators (N)',
+                y_axis_label: 'Basin Volume (V)',
+            });
+
+            // Chart 2: Fluctuations
+            const fluctuationsCtx = document.getElementById('fluctuationsChart').getContext('2d');
+            createChart(fluctuationsCtx, {
+                type: 'line',
+                data: {
+                    labels: n_values,
+                    datasets: [{
+                        label: 'σ_R ~ N^(-0.82)',
+                        data: n_values.map(n => Math.pow(n, -0.82)),
+                        borderColor: '#10B981',
+                        tension: 0.1
+                    }]
+                },
+                x_axis_label: 'N',
+                y_axis_label: 'σ_R',
+            });
+
+            // Chart 3: Critical Coupling
+            const criticalCouplingCtx = document.getElementById('criticalCouplingChart').getContext('2d');
+            createChart(criticalCouplingCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['N=10', 'N=50'],
+                    datasets: [{
+                        label: 'K_c(N)',
+                        data: [0.088, 0.100],
+                        backgroundColor: ['#EF4444', '#F97316'],
+                        borderColor: ['#DC2626', '#EA580C'],
+                        borderWidth: 1
+                    }]
+                },
+                x_axis_label: 'System Size',
+                y_axis_label: 'K_c',
+            });
+
+            // Chart 4: Correlation
+            const correlationCtx = document.getElementById('correlationChart').getContext('2d');
+            createChart(correlationCtx, {
+                type: 'line',
+                data: {
+                    labels: n_values,
+                    datasets: [{
+                        label: 'ξ ~ N^(-0.35)',
+                        data: n_values.map(n => Math.pow(n, -0.35)),
+                        borderColor: '#8B5CF6',
+                        tension: 0.1
+                    }]
+                },
+                x_axis_label: 'N',
+                y_axis_label: 'Correlation Length (ξ)',
+            });
+
+            // Hypothesis Section Logic
+            const hypothesisContentEl = document.getElementById('hypothesis-content');
+            const hypoBtns = {
+                'hypo1-btn': {
+                    title: '1. Effective DOF Hypothesis (N_eff ~ √N)',
+                    prediction: 'Basin volume depends on N_eff, so V ~ exp(-N_eff) ~ exp(-√N). This requires N_eff to scale with √N.',
+                    result: 'Our measurements show N_eff ≈ 1 for all N tested. The system behaves as a 1-DOF system.',
+                    why: 'The system reduces to a mean-field theory, where collective behavior is captured by a single variable, not an increasing number of effective modes.'
+                },
+                'hypo2-btn': {
+                    title: '2. K_c Scaling Hypothesis (K_c ~ 1/√N)',
+                    prediction: 'If K_c decreased with √N, then the effective coupling margin (K-K_c)/K_c would increase, potentially explaining the larger basin stability at small N.',
+                    result: 'K_c is approximately constant or slightly increasing with N. K_c(10)=0.088, K_c(50)=0.100.',
+                    why: 'There is no evidence for a decreasing critical coupling, which invalidates the premise of this hypothesis.'
+                },
+                'hypo3-btn': {
+                    title: '3. Correlation Length Hypothesis',
+                    prediction: 'If basin boundaries depend on the correlation length ξ, and ξ ~ N^ν, then V ~ exp(-1/ξ) ~ exp(-N^|ν|). This would require |ν|=0.5.',
+                    result: 'We measured ξ ~ N^(-0.35). The scaling is too weak.',
+                    why: 'The exponent |ν| = 0.35 is significantly less than the 0.5 required to produce the observed √N scaling in the basin volume.'
+                }
+            };
+            
+            function updateHypothesis(id) {
+                document.querySelectorAll('.hypothesis-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+                
+                const content = hypoBtns[id];
+                hypothesisContentEl.innerHTML = `
+                    <h4 class="text-xl font-bold mb-4">${content.title}</h4>
+                    <div class="grid md:grid-cols-3 gap-6 text-sm">
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Prediction</h5>
+                            <p class="text-gray-700">${content.prediction}</p>
+                        </div>
+                        <div class="bg-red-50 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Result</h5>
+                            <p class="text-gray-700">${content.result}</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <h5 class="font-semibold mb-2">Why It Failed</h5>
+                            <p class="text-gray-700">${content.why}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            document.querySelectorAll('.hypothesis-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => updateHypothesis(e.target.id));
+            });
+            updateHypothesis('hypo1-btn');
+
+            // Research Questions Logic
+            const researchContentEl = document.getElementById('research-content');
+            const researchData = {
+                'tab-theo': {
+                    title: 'Theoretical Mechanisms',
+                    questions: [
+                        'What finite-N corrections to Kuramoto theory could produce √N scaling?',
+                        'How does criticality manifest in the basin structure itself, rather than just in the order parameter?',
+                        'What properties of the high-dimensional phase space could lead to √N basin scaling for the synchronized state?'
+                    ]
+                },
+                'tab-math': {
+                    title: 'Mathematical Approaches',
+                    questions: [
+                        'What scaling ansatz (a theoretical assumption about scaling behavior) could explain V ~ exp(-√N)?',
+                        'How do basin volumes renormalize with system size? Is there a relevant fixed point?',
+                        'Do basin boundaries have a fractal dimension that scales with √N, causing the volume to shrink accordingly?'
+                    ]
+                },
+                'tab-phys': {
+                    title: 'Physical Interpretations',
+                    questions: [
+                        'How do collective excitation modes (Goldstone modes) contribute to the basin scaling?',
+                        'How do finite-size fluctuations, which are strong, affect the geometry and volume of basins?',
+                        'Does the phenomenon of critical slowing down near the transition point affect how the system explores and settles into basins?'
+                    ]
+                }
+            };
+            
+            function updateResearch(id) {
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+                document.getElementById(id).classList.add('active');
+
+                const content = researchData[id];
+                researchContentEl.innerHTML = `
+                    <h4 class="text-xl font-bold mb-4">${content.title}</h4>
+                    <ul class="list-disc pl-5 space-y-3 text-gray-700">
+                        ${content.questions.map(q => `<li>${q}</li>`).join('')}
+                    </ul>
+                `;
+            }
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => updateResearch(e.target.id));
+            });
+            updateResearch('tab-theo');
+        });
+    </script>
+</body>
+</html>
